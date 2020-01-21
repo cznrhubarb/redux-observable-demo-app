@@ -1,4 +1,6 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![header image](https://techinscribed.com/wp-content/uploads/2019/06/react-clean-architecture-1.png)
+
+# Redux observable demo app
 
 ## Available Scripts
 
