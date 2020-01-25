@@ -6,6 +6,6 @@ module.exports = {
   plugins: ["jest"],
   rules: {
     "import/prefer-default-export": "off",
-    "no-param-reassign": ["error", { props: true, ignorePropertyModificationsFor: ["draft"] }], // Rule ignored for immer draft
+    "no-param-reassign": ["error", { props: true, ignorePropertyModificationsFor: ["draft", "state"] }], // Rule ignored for immer state
   }
 };

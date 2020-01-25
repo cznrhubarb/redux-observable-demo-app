@@ -1,4 +1,16 @@
-export type TodoItem = {
+export interface TodoData {
+  text: string;
+}
+
+export interface TodoItem extends TodoData {
   id: number;
-  description: string;
-};
+  completed: boolean;
+}
+
+export function todoFactory(data: TodoData): TodoItem {
+  return {
+    id: Math.random(),
+    completed: false,
+    text: data.text
+  };
+}

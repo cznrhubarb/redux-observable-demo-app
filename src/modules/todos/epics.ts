@@ -2,7 +2,7 @@ import { combineEpics, Epic } from "redux-observable";
 import {
   switchMap,
   map,
-  startWith,
+  // startWith,
   catchError,
   filter,
   mergeMap
@@ -10,39 +10,37 @@ import {
 import { ajax } from "rxjs/ajax";
 import { from, of } from "rxjs";
 
-import { TypeFromCreator } from "../../tsHelpers";
+// import { TypeFromCreator } from "../../tsHelpers";
 
-import * as TodoActionCreator from "./actions";
-import { TodosActionTypes } from "./actionTypes";
+import { actions } from "./slice";
+import { todoFactory } from "./models";
 
-type TodoActions = TypeFromCreator<typeof TodoActionCreator>;
+type TodoActions = typeof actions;
 
-const loadTodosEpic: Epic<TodoActions, TodoActions, void> = action$ =>
+const loadTodosEpic: Epic<any, any, void> = action$ =>
   action$.pipe(
-    filter(action => action.type === TodosActionTypes.LOAD_TODOS),
+    filter(actions.loadTodos.match),
     switchMap(() =>
       from(ajax({ url: "http://localhost:5000/todos", method: "GET" })).pipe(
-        map(response => TodoActionCreator.loadedTodos(response.response)),
-        startWith(TodoActionCreator.loadingTodos()),
-        catchError(() => of(TodoActionCreator.loadingTodosFailed()))
+        map(response => actions.loadTodosDone(response.response)),
+        catchError(() => of(actions.loadTodosError()))
       )
     )
   );
 
-const addTodoEpic: Epic<TodoActions, TodoActions, void> = action$ =>
+const addTodoEpic: Epic<any, any, void> = action$ =>
   action$.pipe(
-    filter(action => action.type === TodosActionTypes.ADD_TODO),
-    mergeMap(() =>
+    filter(actions.addTodo.match),
+    mergeMap(action =>
       from(
         ajax({
           url: "http://localhost:5000/todos",
-          method: "POST"
-          // body: action.payload
+          method: "POST",
+          body: todoFactory(action.payload)
         })
       ).pipe(
-        map(response => TodoActionCreator.addedTodo(response.response)),
-        startWith(TodoActionCreator.addingTodo()),
-        catchError(() => of(TodoActionCreator.addingTodoFailed()))
+        map(response => actions.addTodoDone(response.response)),
+        catchError(() => of(actions.addTodoError()))
       )
     )
   );

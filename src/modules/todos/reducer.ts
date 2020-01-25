@@ -5,7 +5,8 @@ import { TypeFromCreator } from "../../tsHelpers";
 
 import { TodoItem } from "./models";
 import * as TodoActionCreator from "./actions";
-import { TodosActionTypes } from "./actionTypes";
+
+const { ActionTypes } = TodoActionCreator;
 
 export type TodoState = {
   loadingStatus: ApiStatus;
@@ -19,7 +20,7 @@ export const initialState: TodoState = {
   todos: []
 };
 
-type TodoActionTypes = TypeFromCreator<typeof TodoActionCreator>;
+type TodoActionTypes = TypeFromCreator<any>;
 
 export default function todosReducer(
   state: TodoState = initialState,
@@ -27,30 +28,30 @@ export default function todosReducer(
 ) {
   return produce(state, draft => {
     switch (action.type) {
-      case TodosActionTypes.LOAD_TODOS:
-      case TodosActionTypes.LOADING_TODOS:
+      case ActionTypes.LOAD_TODOS:
+      case ActionTypes.LOADING_TODOS:
         draft.loadingStatus = ApiStatus.LOADING;
         break;
 
-      case TodosActionTypes.LOADING_TODOS_FAILED:
+      case ActionTypes.LOADING_TODOS_FAILED:
         draft.loadingStatus = ApiStatus.FAILED;
         break;
 
-      case TodosActionTypes.LOADED_TODOS:
+      case ActionTypes.LOADED_TODOS:
         draft.loadingStatus = ApiStatus.LOADED;
         draft.todos = action.payload.todos;
         break;
 
-      case TodosActionTypes.ADD_TODO:
-      case TodosActionTypes.ADDING_TODO:
+      case ActionTypes.ADD_TODO:
+      case ActionTypes.ADDING_TODO:
         draft.addingStatus = ApiStatus.LOADING;
         break;
 
-      case TodosActionTypes.ADDING_TODOS_FAILED:
+      case ActionTypes.ADDING_TODOS_FAILED:
         draft.addingStatus = ApiStatus.FAILED;
         break;
 
-      case TodosActionTypes.ADDED_TODOS:
+      case ActionTypes.ADDED_TODOS:
         draft.todos.push(action.payload.todo);
         break;
 

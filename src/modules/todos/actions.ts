@@ -1,59 +1,39 @@
-import { TodosActionTypes } from "./actionTypes";
+import { createAction } from "@reduxjs/toolkit";
+
 import { TodoItem } from "./models";
 
-export function loadTodos() {
-  return {
-    type: TodosActionTypes.LOAD_TODOS
-  } as const;
+export enum ActionTypes {
+  LOAD_TODOS = "todos/load",
+  LOADING_TODOS = "todos/loading",
+  LOADED_TODOS = "todos/loaded",
+  LOADING_TODOS_FAILED = "todos/loading_failed",
+
+  ADD_TODO = "todos/add",
+  ADDING_TODO = "todos/adding",
+  ADDED_TODOS = "todos/added",
+  ADDING_TODOS_FAILED = "todos/adding_failed"
 }
 
-export function loadingTodos() {
-  return {
-    type: TodosActionTypes.LOADING_TODOS
-  } as const;
-}
+export const actions = {
+  loadTodos: createAction(ActionTypes.LOAD_TODOS)
+};
 
-export function loadedTodos(todos: TodoItem[]) {
-  return {
-    type: TodosActionTypes.LOADED_TODOS,
-    payload: {
-      todos
-    }
-  } as const;
-}
+export const loadTodos = createAction(ActionTypes.LOAD_TODOS);
 
-export function loadingTodosFailed() {
-  return {
-    type: TodosActionTypes.LOADING_TODOS_FAILED
-  } as const;
-}
+export const loadedTodos = createAction<{ todos: TodoItem[] }>(
+  ActionTypes.LOADED_TODOS
+);
 
-export function addTodo(description: string) {
-  return {
-    type: TodosActionTypes.ADD_TODO,
-    payload: {
-      description
-    }
-  } as const;
-}
+export const loadingTodosFailed = createAction(
+  ActionTypes.LOADING_TODOS_FAILED
+);
 
-export function addingTodo() {
-  return {
-    type: TodosActionTypes.ADDING_TODO
-  } as const;
-}
+export const addTodo = createAction<{ text: string }>(ActionTypes.ADD_TODO);
 
-export function addedTodo(todo: TodoItem) {
-  return {
-    type: TodosActionTypes.ADDED_TODOS,
-    payload: {
-      todo
-    }
-  } as const;
-}
+export const addingTodo = createAction(ActionTypes.ADDING_TODO);
 
-export function addingTodoFailed() {
-  return {
-    type: TodosActionTypes.ADDING_TODOS_FAILED
-  } as const;
-}
+export const addedTodo = createAction<{ todo: TodoItem }>(
+  ActionTypes.ADDED_TODOS
+);
+
+export const addingTodoFailed = createAction(ActionTypes.ADDING_TODOS_FAILED);

@@ -6,9 +6,12 @@ import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
-import { CircularProgress, Typography, WithStyles } from "@material-ui/core";
-import { ITodoItem, ApiStatus } from "../models";
-import { loadTodos } from "../actions/todosActions";
+import { CircularProgress, Typography } from "@material-ui/core";
+
+import { actions as todoActions } from "@modules/todos";
+import { AppState } from "./store";
+import { TodoState } from "./modules/todos/reducer";
+import { ApiStatus } from "./modules/common";
 
 const useStyles = makeStyles((theme: Theme) => ({
   wrap: {
@@ -19,27 +22,27 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: 500
   },
   addButton: {
-    marginTop: theme.spacing.unit
+    marginTop: theme.spacing()
   },
   divider: {
-    marginTop: theme.spacing.unit * 2,
-    marginBottom: theme.spacing.unit * 2
+    marginTop: theme.spacing() * 2,
+    marginBottom: theme.spacing() * 2
   }
 }));
 
-const App: React.FC<AppProps> = props => {
+const App: React.FC = () => {
   const [desc, setDesc] = useState("");
-  const todos = useSelector(state => state.todos.todos);
-  const loadingStatus = useSelector(state => state.todos.loadingStatus);
+  const todosState = useSelector<AppState, TodoState>(state => state.todos);
+  const { todos, loadingStatus } = todosState;
   const classes = useStyles();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(loadTodos());
-  }, []);
+    dispatch(todoActions.loadTodos());
+  }, [dispatch]);
 
   const addNewTodo = () => {
-    dispatch(addTodo(desc));
+    dispatch(todoActions.addTodo({ text: desc }));
   };
 
   const onDescChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,7 +83,7 @@ const App: React.FC<AppProps> = props => {
           )}
 
           {loadingStatus === ApiStatus.LOADED &&
-            todos.map(todo => <Paper key={todo.id}>{todo.description}</Paper>)}
+            todos.map(todo => <Paper key={todo.id}>{todo.text}</Paper>)}
         </div>
       </div>
     </div>
@@ -88,5 +91,3 @@ const App: React.FC<AppProps> = props => {
 };
 
 export default App;
-
-type AppProps = WithStyles<typeof styles>;
