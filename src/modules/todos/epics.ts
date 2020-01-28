@@ -2,22 +2,21 @@ import { combineEpics, Epic } from "redux-observable";
 import {
   switchMap,
   map,
-  // startWith,
   catchError,
   filter,
-  mergeMap
+  mergeMap,
+  startWith,
+  takeUntil
 } from "rxjs/operators";
 import { ajax } from "rxjs/ajax";
 import { from, of } from "rxjs";
 
-// import { TypeFromCreator } from "../../tsHelpers";
-
 import { actions } from "./slice";
-import { todoFactory } from "./models";
+import { createTodo } from "./models";
 
-type TodoActions = typeof actions;
+// const DELAY_TIME = 3000;
 
-const loadTodosEpic: Epic<any, any, void> = action$ =>
+const loadTodosEpic: Epic = action$ =>
   action$.pipe(
     filter(actions.loadTodos.match),
     switchMap(() =>
@@ -28,7 +27,7 @@ const loadTodosEpic: Epic<any, any, void> = action$ =>
     )
   );
 
-const addTodoEpic: Epic<any, any, void> = action$ =>
+const addTodoEpic: Epic = action$ =>
   action$.pipe(
     filter(actions.addTodo.match),
     mergeMap(action =>
@@ -36,7 +35,10 @@ const addTodoEpic: Epic<any, any, void> = action$ =>
         ajax({
           url: "http://localhost:5000/todos",
           method: "POST",
-          body: todoFactory(action.payload)
+          body: createTodo(action.payload),
+          headers: {
+            "Content-Type": "application/json"
+          }
         })
       ).pipe(
         map(response => actions.addTodoDone(response.response)),
@@ -45,4 +47,53 @@ const addTodoEpic: Epic<any, any, void> = action$ =>
     )
   );
 
-export default combineEpics(loadTodosEpic, addTodoEpic);
+const removeTodoEpic: Epic = action$ =>
+  action$.pipe(
+    filter(actions.removeTodo.match),
+    mergeMap(action =>
+      from(
+        ajax({
+          url: `http://localhost:5000/todos/${action.payload.item.id}`,
+          method: "DELETE"
+        })
+      ).pipe(
+        map(() => actions.removeTodoDone(action.payload)),
+        startWith(actions.removeTodoInProgress(action.payload)),
+        catchError((error: Error) =>
+          of(actions.removeTodoError({ ...action.payload, error }))
+        ),
+        takeUntil(action$.pipe(filter(actions.removeTodoCancel.match)))
+      )
+    )
+  );
+
+const updateTodoEpic: Epic = action$ =>
+  action$.pipe(
+    filter(actions.updateTodo.match),
+    mergeMap(action =>
+      from(
+        ajax({
+          url: `http://localhost:5000/todos/${action.payload.item.id}`,
+          method: "PUT",
+          body: { ...action.payload.item, ...action.payload.data }, // Move update somewhere else
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+      ).pipe(
+        map(() => actions.updateTodoDone(action.payload)),
+        startWith(actions.updateTodoInProgress(action.payload)),
+        catchError((error: Error) =>
+          of(actions.updateTodoError({ ...action.payload, error }))
+        ),
+        takeUntil(action$.pipe(filter(actions.updateTodoCancel.match)))
+      )
+    )
+  );
+
+export default combineEpics(
+  loadTodosEpic,
+  addTodoEpic,
+  removeTodoEpic,
+  updateTodoEpic
+);

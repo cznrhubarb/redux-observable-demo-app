@@ -4,13 +4,11 @@ import { combineEpics, createEpicMiddleware } from "redux-observable";
 import { createLogger } from "redux-logger";
 
 import {
-  // TodoState,
+  TodoState,
   epics as todosEpics,
   reducer as todosReducer,
   initialState as todosInitialState
-} from "../modules/todos";
-
-import { TodoState } from "../modules/todos/reducer";
+} from "@modules/todos";
 
 export interface AppState {
   todos: TodoState;

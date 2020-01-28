@@ -1,3 +1,13 @@
 {
-  "todos": []
+  "todos": [
+    {
+      "id": 0.7979236113477988,
+      "completed": false,
+      "text": "New thing",
+      "request": {
+        "type": "update",
+        "state": "success"
+      }
+    }
+  ]
 }

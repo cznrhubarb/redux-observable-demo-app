@@ -5,13 +5,17 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
-import Paper from "@material-ui/core/Paper";
 import { CircularProgress, Typography } from "@material-ui/core";
 
-import { actions as todoActions } from "@modules/todos";
-import { AppState } from "./store";
-import { TodoState } from "./modules/todos/reducer";
-import { ApiStatus } from "./modules/common";
+import {
+  actions as todoActions,
+  TodoState,
+  TodoItem,
+  TodoList,
+  TodoData
+} from "@modules/todos";
+import { ApiStatus } from "@modules/common";
+import { AppState } from "@store/index";
 
 const useStyles = makeStyles((theme: Theme) => ({
   wrap: {
@@ -43,6 +47,19 @@ const App: React.FC = () => {
 
   const addNewTodo = () => {
     dispatch(todoActions.addTodo({ text: desc }));
+    setDesc("");
+  };
+
+  const deleteTodo = (item: TodoItem) => {
+    dispatch(todoActions.removeTodo({ item }));
+  };
+
+  const deleteTodoCancel = (item: TodoItem) => {
+    dispatch(todoActions.removeTodoCancel({ item }));
+  };
+
+  const updateTodo = (item: TodoItem, data: Partial<TodoData>) => {
+    dispatch(todoActions.updateTodo({ item, data }));
   };
 
   const onDescChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +80,7 @@ const App: React.FC = () => {
             fullWidth
           />
           <Button
+            disabled={!desc}
             className={classes.addButton}
             color="primary"
             variant="contained"
@@ -82,8 +100,14 @@ const App: React.FC = () => {
             <Typography color="error">Failed to load todos</Typography>
           )}
 
-          {loadingStatus === ApiStatus.LOADED &&
-            todos.map(todo => <Paper key={todo.id}>{todo.text}</Paper>)}
+          {loadingStatus === ApiStatus.LOADED && (
+            <TodoList
+              items={todos}
+              onItemUpdate={updateTodo}
+              onItemDelete={deleteTodo}
+              onItemDeleteCancel={deleteTodoCancel}
+            />
+          )}
         </div>
       </div>
     </div>

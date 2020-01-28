@@ -1,16 +1,18 @@
 export interface TodoData {
   text: string;
+  completed?: boolean;
 }
 
-export interface TodoItem extends TodoData {
+export interface Item {
   id: number;
-  completed: boolean;
 }
 
-export function todoFactory(data: TodoData): TodoItem {
+export interface TodoItem extends TodoData, Item {}
+
+export function createTodo(data: TodoData): TodoItem {
   return {
     id: Math.random(),
-    completed: false,
+    completed: data.completed ?? false,
     text: data.text
   };
 }

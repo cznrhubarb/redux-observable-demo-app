@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { createStore } from "./store";
 import App from "./App";
 
+// Look into store.scubsrcibe
 const store = createStore();
 
 ReactDOM.render(
