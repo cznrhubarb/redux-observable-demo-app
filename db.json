@@ -1,13 +1,24 @@
 {
   "todos": [
     {
-      "id": 0.7979236113477988,
-      "completed": false,
-      "text": "New thing",
-      "request": {
-        "type": "update",
-        "state": "success"
-      }
+      "id": 0.57107734396506,
+      "completed": true,
+      "text": "New todo"
+    },
+    {
+      "id": 0.11841279298098084,
+      "completed": true,
+      "text": "Todo 2"
+    },
+    {
+      "id": 0.7983959019215394,
+      "completed": true,
+      "text": "Todo 3"
+    },
+    {
+      "id": 0.2956951379331201,
+      "completed": true,
+      "text": "Todo 4"
     }
   ]
 }

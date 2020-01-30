@@ -5,7 +5,8 @@ import {
   Checkbox,
   IconButton,
   ListItemText,
-  ListItemSecondaryAction
+  ListItemSecondaryAction,
+  CircularProgress
 } from "@material-ui/core";
 
 import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
@@ -37,14 +38,22 @@ const TodoListItem: React.FC<Props> = memo(props => {
 
   return (
     <ListItem divider={divider}>
-      <Checkbox onClick={onCheckBoxToggle} checked={checked} disableRipple />
+      {request &&
+      request.type === RequestType.update &&
+      [RequestState.initial, RequestState.in_progress].includes(
+        request.state
+      ) ? (
+        <CircularProgress size={42} color="secondary" />
+      ) : (
+        <Checkbox onClick={onCheckBoxToggle} checked={checked} />
+      )}
 
       <ListItemText
         primary={text}
         secondary={request && `Request ${request.type} ${request.state}`}
       />
 
-      {!request?.state || request?.state === RequestState.success ? (
+      {!request?.state || request.type !== RequestType.delete ? (
         <ListItemSecondaryAction>
           <IconButton aria-label="Delete Todo" onClick={onDeleteButtonClick}>
             <DeleteOutlined />
@@ -62,15 +71,19 @@ const TodoListItem: React.FC<Props> = memo(props => {
         </ListItemSecondaryAction>
       ) : null}
 
-      {request &&
-      request.type === RequestType.delete &&
-      [RequestState.initial, RequestState.in_progress].includes(
-        request.state
-      ) ? (
+      {request?.type === RequestType.delete &&
+      request?.state === RequestState.initial ? (
         <ListItemSecondaryAction>
           <IconButton aria-label="Cancel" onClick={onCancelButtonClick}>
             <CancelOutlined />
           </IconButton>
+        </ListItemSecondaryAction>
+      ) : null}
+
+      {request?.type === RequestType.delete &&
+      request?.state === RequestState.in_progress ? (
+        <ListItemSecondaryAction>
+          <CircularProgress size={42} />
         </ListItemSecondaryAction>
       ) : null}
     </ListItem>

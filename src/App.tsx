@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { makeStyles, Theme } from "@material-ui/core/styles";
@@ -12,7 +12,8 @@ import {
   TodoState,
   TodoItem,
   TodoList,
-  TodoData
+  TodoData,
+  TodoItemState
 } from "@modules/todos";
 import { ApiStatus } from "@modules/common";
 import { AppState } from "@store/index";
@@ -36,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const App: React.FC = () => {
   const [desc, setDesc] = useState("");
+  const textRef = useRef<HTMLInputElement>();
   const todosState = useSelector<AppState, TodoState>(state => state.todos);
   const { todos, loadingStatus } = todosState;
   const classes = useStyles();
@@ -48,6 +50,7 @@ const App: React.FC = () => {
   const addNewTodo = () => {
     dispatch(todoActions.addTodo({ text: desc }));
     setDesc("");
+    return textRef.current?.focus();
   };
 
   const deleteTodo = (item: TodoItem) => {
@@ -58,7 +61,8 @@ const App: React.FC = () => {
     dispatch(todoActions.removeTodoCancel({ item }));
   };
 
-  const updateTodo = (item: TodoItem, data: Partial<TodoData>) => {
+  const updateTodo = (itemState: TodoItemState, data: Partial<TodoData>) => {
+    const { request, ...item } = itemState;
     dispatch(todoActions.updateTodo({ item, data }));
   };
 
@@ -72,6 +76,8 @@ const App: React.FC = () => {
         <div>
           <TextField
             multiline
+            autoFocus
+            inputRef={textRef}
             placeholder="Enter todo message"
             rows="5"
             variant="outlined"

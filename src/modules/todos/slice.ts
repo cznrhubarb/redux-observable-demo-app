@@ -45,7 +45,19 @@ export const initialState: TodoState = {
 };
 
 function setRequest<T extends ItemWithRequest>(item: T, request: Request): T {
-  return { ...item, request };
+  const activeRequest = item.request;
+  const activeRequestInProgress =
+    activeRequest &&
+    [RequestState.initial, RequestState.in_progress].includes(
+      activeRequest.state
+    );
+  const sameRequestType = activeRequest?.type === request.type;
+
+  if (!activeRequestInProgress || sameRequestType) {
+    return { ...item, request };
+  }
+
+  return item;
 }
 
 function setRequestOnListItem<T extends ItemWithRequest>(

@@ -7,6 +7,7 @@ module.exports = {
   rules: {
     "import/prefer-default-export": "off",
     "no-param-reassign": ["error", { props: true, ignorePropertyModificationsFor: ["draft", "state"] }], // Rule ignored for immer state
+    "@typescript-eslint/no-unused-vars": ["error", { "ignoreRestSiblings": true }]
   },
   settings: {
     "import/resolver": {

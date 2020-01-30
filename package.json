@@ -27,7 +27,7 @@
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "server": "json-server --watch db.json --port 5000"
+    "server": "json-server --watch db.json --port 5000 --delay 2000"
   },
   "eslintConfig": {
     "extends": "react-app"
