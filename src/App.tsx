@@ -75,8 +75,6 @@ const App: React.FC = () => {
     setDesc(e.target.value);
   };
 
-  console.log(todosRequest);
-
   return (
     <Wrap>
       <Content>
