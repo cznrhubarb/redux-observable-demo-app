@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { makeStyles, Theme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
+import MUDivider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
 import { CircularProgress, Typography } from "@material-ui/core";
+
+import styled from "styled-components";
 
 import {
   actions as todoActions,
@@ -18,29 +19,29 @@ import {
 import { ApiStatus } from "@modules/common";
 import { AppState } from "@store/index";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  wrap: {
-    display: "flex",
-    justifyContent: "center"
-  },
-  content: {
-    width: 500
-  },
-  addButton: {
-    marginTop: theme.spacing()
-  },
-  divider: {
-    marginTop: theme.spacing() * 2,
-    marginBottom: theme.spacing() * 2
-  }
-}));
+const Wrap = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const Content = styled.div`
+  width: 500px;
+`;
+
+const AddButton = styled(Button)`
+  margin-top: 10px;
+`;
+
+const Divider = styled(MUDivider)`
+  margin-top: 10px;
+  margin-bottom: 10px;
+`;
 
 const App: React.FC = () => {
   const [desc, setDesc] = useState("");
   const textRef = useRef<HTMLInputElement>();
   const todosState = useSelector<AppState, TodoState>(state => state.todos);
   const { todos, loadingStatus } = todosState;
-  const classes = useStyles();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -71,8 +72,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={classes.wrap}>
-      <div className={classes.content}>
+    <Wrap>
+      <Content>
         <div>
           <TextField
             multiline
@@ -85,19 +86,18 @@ const App: React.FC = () => {
             value={desc}
             fullWidth
           />
-          <Button
+          <AddButton
             disabled={!desc}
-            className={classes.addButton}
             color="primary"
             variant="contained"
             onClick={addNewTodo}
             fullWidth
           >
             Add Todo
-          </Button>
+          </AddButton>
         </div>
 
-        <Divider className={classes.divider} />
+        <Divider />
 
         <div>
           {loadingStatus === ApiStatus.LOADING && <CircularProgress />}
@@ -115,8 +115,8 @@ const App: React.FC = () => {
             />
           )}
         </div>
-      </div>
-    </div>
+      </Content>
+    </Wrap>
   );
 };
 
