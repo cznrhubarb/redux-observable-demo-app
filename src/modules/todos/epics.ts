@@ -24,7 +24,8 @@ const loadTodosEpic: Epic = action$ =>
     switchMap(() =>
       from(ajax({ url: "http://localhost:5000/todos", method: "GET" })).pipe(
         map(response => actions.loadTodosDone(response.response)),
-        catchError(() => of(actions.loadTodosError()))
+        startWith(actions.loadTodosInProgress()),
+        catchError((error: Error) => of(actions.loadTodosError({ error })))
       )
     )
   );
@@ -44,7 +45,10 @@ const addTodoEpic: Epic = action$ =>
         })
       ).pipe(
         map(response => actions.addTodoDone(response.response)),
-        catchError(() => of(actions.addTodoError()))
+        startWith(actions.addTodoInProgress(action.payload)),
+        catchError((error: Error) =>
+          of(actions.addTodoError({ ...action.payload, error }))
+        )
       )
     )
   );
@@ -70,18 +74,6 @@ const removeTodoEpic: Epic = action$ =>
     takeUntil(action$.pipe(filter(actions.removeTodoCancel.match))),
     repeat()
   );
-
-// const removeTodoEpic: Epic = (action$, state$) =>
-//   action$.pipe(
-//     filter(actions.removeTodo.match),
-//     delay(DELAY_TIME),
-//     switchMapTo(state$),
-//     filter(state => state.todos.todos),
-//     map(todos => {
-//       console.log(todos);
-//       return todos;
-//     })
-//   );
 
 const updateTodoEpic: Epic = action$ =>
   action$.pipe(

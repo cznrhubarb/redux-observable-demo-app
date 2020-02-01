@@ -13,7 +13,12 @@ import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
 import CancelOutlined from "@material-ui/icons/CancelOutlined";
 import RepeatRounded from "@material-ui/icons/RepeatRounded";
 
-import { Request, RequestState, RequestType } from "@modules/common/request";
+import {
+  isMatching,
+  Request,
+  RequestState,
+  RequestType,
+} from "@modules/common/request";
 
 export interface Props {
   text: string;
@@ -38,10 +43,10 @@ const TodoListItem: React.FC<Props> = props => {
 
   return (
     <ListItem divider={divider}>
-      {request &&
-      request.type === RequestType.update &&
-      [RequestState.initial, RequestState.in_progress].includes(
-        request.state
+      {isMatching(
+        request,
+        [RequestState.initial, RequestState.inProgress],
+        RequestType.update
       ) ? (
         <CircularProgress size={42} color="secondary" />
       ) : (
@@ -53,7 +58,7 @@ const TodoListItem: React.FC<Props> = props => {
         secondary={request && `Request ${request.type} ${request.state}`}
       />
 
-      {!request?.state || request.type !== RequestType.delete ? (
+      {!isMatching(request, [], RequestType.delete) ? (
         <ListItemSecondaryAction>
           <IconButton aria-label="Delete Todo" onClick={onDeleteButtonClick}>
             <DeleteOutlined />
@@ -61,9 +66,11 @@ const TodoListItem: React.FC<Props> = props => {
         </ListItemSecondaryAction>
       ) : null}
 
-      {request &&
-      request.type === RequestType.delete &&
-      [RequestState.error, RequestState.canceled].includes(request.state) ? (
+      {isMatching(
+        request,
+        [RequestState.error, RequestState.canceled],
+        RequestType.delete
+      ) ? (
         <ListItemSecondaryAction>
           <IconButton aria-label="Retry Todo" onClick={onDeleteButtonClick}>
             <RepeatRounded />
@@ -71,8 +78,7 @@ const TodoListItem: React.FC<Props> = props => {
         </ListItemSecondaryAction>
       ) : null}
 
-      {request?.type === RequestType.delete &&
-      request?.state === RequestState.initial ? (
+      {isMatching(request, RequestState.initial, RequestType.delete) ? (
         <ListItemSecondaryAction>
           <IconButton aria-label="Cancel" onClick={onCancelButtonClick}>
             <CancelOutlined />
@@ -80,8 +86,7 @@ const TodoListItem: React.FC<Props> = props => {
         </ListItemSecondaryAction>
       ) : null}
 
-      {request?.type === RequestType.delete &&
-      request?.state === RequestState.in_progress ? (
+      {isMatching(request, RequestState.inProgress, RequestType.delete) ? (
         <ListItemSecondaryAction>
           <CircularProgress size={42} />
         </ListItemSecondaryAction>

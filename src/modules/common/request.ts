@@ -2,7 +2,7 @@ import { Item } from "./models";
 
 export enum RequestState {
   initial = "initial", // Not processed yet
-  in_progress = "in_progress", // Request is processing
+  inProgress = "inProgress", // Request is processing
   success = "success", // Request finished and succeeds
   error = "error", // Request finished and failed
   canceled = "canceled", //  Request canceled by user
@@ -24,33 +24,36 @@ export interface Request<P = void> {
 
 export const requestSymbol = Symbol("request");
 
-export interface ItemWithRequest<P = void> extends Item {
+export interface WithRequest<P = void> {
   [requestSymbol]?: Request<P>;
 }
 
-export function getRequest(item: ItemWithRequest): Request | undefined {
+export function getRequest<P>(item: WithRequest<P>): Request<P> | undefined {
   return item[requestSymbol];
 }
 
-export function setRequest<T extends ItemWithRequest>(
+export function setRequest<T extends WithRequest<P>, P>(
   item: T,
-  request: Request
+  request: Request<P>
 ): T {
   const activeRequest = getRequest(item);
 
   const activeRequestInProgress =
     activeRequest &&
-    [RequestState.initial, RequestState.in_progress].includes(
+    [RequestState.initial, RequestState.inProgress].includes(
       activeRequest.state
     );
   const sameRequestType = activeRequest?.type === request.type;
 
   if (!activeRequestInProgress || sameRequestType) {
-    return { ...item, [requestSymbol]: request };
+    // eslint-disable-next-line no-param-reassign
+    item[requestSymbol] = request;
   }
 
   return item;
 }
+
+export interface ItemWithRequest extends Item, WithRequest {}
 
 export function setRequestOnListItem<T extends ItemWithRequest>(
   list: T[],
@@ -67,8 +70,8 @@ export function setRequestOnListItem<T extends ItemWithRequest>(
   return list;
 }
 
-export function isMatchingRequest(
-  request: Request | undefined,
+export function isMatching<P>(
+  request: Request<P> | undefined,
   state: RequestState | RequestState[],
   type?: RequestType
 ): boolean {
@@ -81,7 +84,7 @@ export function isMatchingRequest(
   }
 
   if (Array.isArray(state)) {
-    return state.includes(request.state);
+    return state.length ? state.includes(request.state) : true;
   }
 
   return request.state === state;

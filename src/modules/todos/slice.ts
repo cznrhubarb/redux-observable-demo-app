@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction, createAction } from "@reduxjs/toolkit";
 
 import {
+  setRequest,
+  WithRequest,
   ItemWithRequest,
   RequestType,
   RequestState,
@@ -10,35 +12,15 @@ import { TodoItem, TodoData } from "./models";
 
 export interface TodoItemState extends TodoItem, ItemWithRequest {}
 
-export function createRequestSlice(name: string) {
-  const actions = [
-    name,
-    `${name}InProgress`,
-    `${name}Done`,
-    `${name}Cancel`,
-    `${name}Error`,
-  ].reduce(
-    (slice, actionKey) => ({ ...slice, [actionKey]: createAction(actionKey) }),
-    {}
-  );
-
-  return actions;
-}
-
 export function createRequestAction(name: string) {
-  return createAction(`${name}/setRequest`);
+  createAction(`${name}/setRequest`);
 }
 
-export interface TodoState {
-  loadingStatus: RequestState;
-  addingStatus: RequestState;
-  todoToAdd?: TodoData;
+export interface TodoState extends WithRequest<TodoData> {
   todos: TodoItemState[];
 }
 
 export const initialState: TodoState = {
-  loadingStatus: RequestState.initial,
-  addingStatus: RequestState.initial,
   todos: [],
 };
 
@@ -48,35 +30,70 @@ const slice = createSlice({
   initialState,
   reducers: {
     loadTodos(state: TodoState) {
-      state.loadingStatus = RequestState.in_progress;
+      setRequest(state, {
+        type: RequestType.read,
+        state: RequestState.initial,
+      });
+    },
+
+    loadTodosInProgress(state: TodoState) {
+      setRequest(state, {
+        type: RequestType.read,
+        state: RequestState.inProgress,
+      });
     },
 
     loadTodosDone(state: TodoState, action: PayloadAction<TodoItem[]>) {
-      state.loadingStatus = RequestState.success;
+      setRequest(state, {
+        type: RequestType.read,
+        state: RequestState.success,
+      });
+
       state.todos = action.payload;
     },
 
-    loadTodosError(state: TodoState) {
-      state.loadingStatus = RequestState.error;
+    loadTodosError(state: TodoState, action: PayloadAction<{ error: Error }>) {
+      setRequest(state, {
+        error: action.payload.error,
+        type: RequestType.read,
+        state: RequestState.error,
+      });
     },
 
     addTodo(state: TodoState, action: PayloadAction<TodoData>) {
-      state.addingStatus = RequestState.in_progress;
-      state.todoToAdd = action.payload;
+      setRequest(state, {
+        type: RequestType.create,
+        state: RequestState.initial,
+        payload: action.payload,
+      });
+    },
+
+    addTodoInProgress(state: TodoState, action: PayloadAction<TodoData>) {
+      setRequest(state, {
+        type: RequestType.create,
+        state: RequestState.inProgress,
+        payload: action.payload,
+      });
     },
 
     addTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
-      state.addingStatus = RequestState.success;
+      setRequest(state, {
+        type: RequestType.create,
+        state: RequestState.success,
+      });
       state.todos.push(action.payload);
-      delete state.todoToAdd;
     },
 
-    addTodoError(state: TodoState) {
-      state.loadingStatus = RequestState.error;
+    addTodoError(state: TodoState, action: PayloadAction<{ error: Error }>) {
+      setRequest(state, {
+        error: action.payload.error,
+        type: RequestType.create,
+        state: RequestState.error,
+      });
     },
 
     removeTodo(state: TodoState, action: PayloadAction<{ item: TodoItem }>) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
+      setRequestOnListItem(state.todos, action.payload.item.id, {
         type: RequestType.delete,
         state: RequestState.initial,
       });
@@ -88,7 +105,7 @@ const slice = createSlice({
     ) {
       state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
         type: RequestType.delete,
-        state: RequestState.in_progress,
+        state: RequestState.inProgress,
       });
     },
 
@@ -142,7 +159,7 @@ const slice = createSlice({
     ) {
       state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
         type: RequestType.update,
-        state: RequestState.in_progress,
+        state: RequestState.inProgress,
       });
     },
 
