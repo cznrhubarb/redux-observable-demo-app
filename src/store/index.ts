@@ -7,7 +7,7 @@ import {
   TodoState,
   epics as todosEpics,
   reducer as todosReducer,
-  initialState as todosInitialState
+  initialState as todosInitialState,
 } from "@modules/todos";
 
 export interface AppState {
@@ -15,12 +15,12 @@ export interface AppState {
 }
 
 export const initialState: AppState = {
-  todos: todosInitialState
+  todos: todosInitialState,
 };
 
 export function createStore() {
   const reducer = combineReducers({
-    todos: todosReducer
+    todos: todosReducer,
   });
 
   const logger = createLogger();
@@ -31,7 +31,7 @@ export function createStore() {
 
   const store = configureStore({
     reducer,
-    middleware
+    middleware,
   });
 
   epicMiddleware.run(rootEpic);

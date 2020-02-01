@@ -13,26 +13,25 @@ import {
   TodoItem,
   TodoList,
   TodoData,
-  TodoItemState
 } from "@modules/todos";
-import { ApiStatus } from "@modules/common";
+import { RequestState } from "@modules/common/request";
 import { AppState } from "@store/index";
 
 const useStyles = makeStyles((theme: Theme) => ({
   wrap: {
     display: "flex",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   content: {
-    width: 500
+    width: 500,
   },
   addButton: {
-    marginTop: theme.spacing()
+    marginTop: theme.spacing(),
   },
   divider: {
     marginTop: theme.spacing() * 2,
-    marginBottom: theme.spacing() * 2
-  }
+    marginBottom: theme.spacing() * 2,
+  },
 }));
 
 const App: React.FC = () => {
@@ -61,8 +60,7 @@ const App: React.FC = () => {
     dispatch(todoActions.removeTodoCancel({ item }));
   };
 
-  const updateTodo = (itemState: TodoItemState, data: Partial<TodoData>) => {
-    const { request, ...item } = itemState;
+  const updateTodo = (item: TodoItem, data: Partial<TodoData>) => {
     dispatch(todoActions.updateTodo({ item, data }));
   };
 
@@ -100,13 +98,13 @@ const App: React.FC = () => {
         <Divider className={classes.divider} />
 
         <div>
-          {loadingStatus === ApiStatus.LOADING && <CircularProgress />}
+          {loadingStatus === RequestState.in_progress && <CircularProgress />}
 
-          {loadingStatus === ApiStatus.FAILED && (
+          {loadingStatus === RequestState.error && (
             <Typography color="error">Failed to load todos</Typography>
           )}
 
-          {loadingStatus === ApiStatus.LOADED && (
+          {loadingStatus === RequestState.success && (
             <TodoList
               items={todos}
               onItemUpdate={updateTodo}

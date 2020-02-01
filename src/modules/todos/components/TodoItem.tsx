@@ -6,14 +6,14 @@ import {
   IconButton,
   ListItemText,
   ListItemSecondaryAction,
-  CircularProgress
+  CircularProgress,
 } from "@material-ui/core";
 
 import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
 import CancelOutlined from "@material-ui/icons/CancelOutlined";
 import RepeatRounded from "@material-ui/icons/RepeatRounded";
 
-import { Request, RequestState, RequestType } from "../slice";
+import { Request, RequestState, RequestType } from "@modules/common/request";
 
 export interface Props {
   text: string;
@@ -25,7 +25,7 @@ export interface Props {
   request?: Request;
 }
 
-const TodoListItem: React.FC<Props> = memo(props => {
+const TodoListItem: React.FC<Props> = props => {
   const {
     text,
     checked,
@@ -33,7 +33,7 @@ const TodoListItem: React.FC<Props> = memo(props => {
     onDeleteButtonClick,
     onCancelButtonClick,
     onCheckBoxToggle,
-    request
+    request,
   } = props;
 
   return (
@@ -88,6 +88,6 @@ const TodoListItem: React.FC<Props> = memo(props => {
       ) : null}
     </ListItem>
   );
-});
+};
 
-export default TodoListItem;
+export default memo(TodoListItem);

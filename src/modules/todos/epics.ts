@@ -7,8 +7,8 @@ import {
   mergeMap,
   startWith,
   takeUntil,
+  delay,
   repeat,
-  delay
 } from "rxjs/operators";
 import { ajax } from "rxjs/ajax";
 import { from, of } from "rxjs";
@@ -39,8 +39,8 @@ const addTodoEpic: Epic = action$ =>
           method: "POST",
           body: createTodo(action.payload),
           headers: {
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         })
       ).pipe(
         map(response => actions.addTodoDone(response.response)),
@@ -57,7 +57,7 @@ const removeTodoEpic: Epic = action$ =>
       from(
         ajax({
           url: `http://localhost:5000/todos/${action.payload.item.id}`,
-          method: "DELETE"
+          method: "DELETE",
         })
       ).pipe(
         map(() => actions.removeTodoDone(action.payload)),
@@ -71,6 +71,18 @@ const removeTodoEpic: Epic = action$ =>
     repeat()
   );
 
+// const removeTodoEpic: Epic = (action$, state$) =>
+//   action$.pipe(
+//     filter(actions.removeTodo.match),
+//     delay(DELAY_TIME),
+//     switchMapTo(state$),
+//     filter(state => state.todos.todos),
+//     map(todos => {
+//       console.log(todos);
+//       return todos;
+//     })
+//   );
+
 const updateTodoEpic: Epic = action$ =>
   action$.pipe(
     filter(actions.updateTodo.match),
@@ -80,10 +92,10 @@ const updateTodoEpic: Epic = action$ =>
         ajax({
           url: `http://localhost:5000/todos/${action.payload.item.id}`,
           method: "PUT",
-          body: { ...action.payload.item, ...action.payload.data }, // Move update somewhere else
+          body: { ...action.payload.item, ...action.payload.data },
           headers: {
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         })
       ).pipe(
         map(() => actions.updateTodoDone(action.payload)),
