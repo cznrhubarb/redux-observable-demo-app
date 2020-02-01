@@ -2,18 +2,13 @@
   "todos": [
     {
       "id": 0.6267263491313737,
-      "completed": false,
+      "completed": true,
       "text": "Todo 5"
     },
     {
       "id": 0.6558201919214632,
-      "completed": false,
+      "completed": true,
       "text": "pink panther"
-    },
-    {
-      "id": 0.37511669760382205,
-      "completed": false,
-      "text": "to do list"
     },
     {
       "id": 0.21602458840359096,

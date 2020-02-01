@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction, createAction } from "@reduxjs/toolkit";
 
 import {
-  setRequest,
   WithRequest,
   ItemWithRequest,
   RequestType,
   RequestState,
+  setRequestMutable,
   setRequestOnListItem,
 } from "@modules/common/request";
 import { TodoItem, TodoData } from "./models";
@@ -30,21 +30,21 @@ const slice = createSlice({
   initialState,
   reducers: {
     loadTodos(state: TodoState) {
-      setRequest(state, {
+      setRequestMutable(state, {
         type: RequestType.read,
         state: RequestState.initial,
       });
     },
 
     loadTodosInProgress(state: TodoState) {
-      setRequest(state, {
+      setRequestMutable(state, {
         type: RequestType.read,
         state: RequestState.inProgress,
       });
     },
 
     loadTodosDone(state: TodoState, action: PayloadAction<TodoItem[]>) {
-      setRequest(state, {
+      setRequestMutable(state, {
         type: RequestType.read,
         state: RequestState.success,
       });
@@ -53,7 +53,7 @@ const slice = createSlice({
     },
 
     loadTodosError(state: TodoState, action: PayloadAction<{ error: Error }>) {
-      setRequest(state, {
+      setRequestMutable(state, {
         error: action.payload.error,
         type: RequestType.read,
         state: RequestState.error,
@@ -61,7 +61,7 @@ const slice = createSlice({
     },
 
     addTodo(state: TodoState, action: PayloadAction<TodoData>) {
-      setRequest(state, {
+      setRequestMutable(state, {
         type: RequestType.create,
         state: RequestState.initial,
         payload: action.payload,
@@ -69,7 +69,7 @@ const slice = createSlice({
     },
 
     addTodoInProgress(state: TodoState, action: PayloadAction<TodoData>) {
-      setRequest(state, {
+      setRequestMutable(state, {
         type: RequestType.create,
         state: RequestState.inProgress,
         payload: action.payload,
@@ -77,7 +77,7 @@ const slice = createSlice({
     },
 
     addTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
-      setRequest(state, {
+      setRequestMutable(state, {
         type: RequestType.create,
         state: RequestState.success,
       });
@@ -85,7 +85,7 @@ const slice = createSlice({
     },
 
     addTodoError(state: TodoState, action: PayloadAction<{ error: Error }>) {
-      setRequest(state, {
+      setRequestMutable(state, {
         error: action.payload.error,
         type: RequestType.create,
         state: RequestState.error,
@@ -93,7 +93,7 @@ const slice = createSlice({
     },
 
     removeTodo(state: TodoState, action: PayloadAction<{ item: TodoItem }>) {
-      setRequestOnListItem(state.todos, action.payload.item.id, {
+      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
         type: RequestType.delete,
         state: RequestState.initial,
       });

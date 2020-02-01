@@ -46,11 +46,19 @@ export function setRequest<T extends WithRequest<P>, P>(
   const sameRequestType = activeRequest?.type === request.type;
 
   if (!activeRequestInProgress || sameRequestType) {
-    // eslint-disable-next-line no-param-reassign
-    item[requestSymbol] = request;
+    return { ...item, [requestSymbol]: request };
   }
 
   return item;
+}
+
+export function setRequestMutable<T extends WithRequest<P>, P>(
+  item: T,
+  request: Request<P>
+): void {
+  const { [requestSymbol]: newRequest } = setRequest(item, request);
+  // eslint-disable-next-line no-param-reassign
+  item[requestSymbol] = newRequest;
 }
 
 export interface ItemWithRequest extends Item, WithRequest {}
