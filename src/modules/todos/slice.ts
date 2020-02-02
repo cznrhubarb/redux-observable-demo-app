@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction, createAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import {
   WithRequest,
@@ -11,10 +11,6 @@ import {
 import { TodoItem, TodoData } from "./models";
 
 export interface TodoItemState extends TodoItem, ItemWithRequest {}
-
-export function createRequestAction(name: string) {
-  createAction(`${name}/setRequest`);
-}
 
 export interface TodoState extends WithRequest<TodoData> {
   todos: TodoItemState[];
@@ -81,6 +77,7 @@ const slice = createSlice({
         type: RequestType.create,
         state: RequestState.success,
       });
+
       state.todos.push(action.payload);
     },
 

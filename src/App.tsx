@@ -104,23 +104,23 @@ const App: React.FC = () => {
         <Divider />
 
         <div>
-          {isMatching(
-            todosRequest,
-            RequestState.inProgress,
-            RequestType.read
-          ) && <CircularProgress />}
+          <TodoList
+            items={todos}
+            onItemUpdate={updateTodo}
+            onItemDelete={deleteTodo}
+            onItemDeleteCancel={deleteTodoCancel}
+          />
+
+          <Wrap>
+            {isMatching(
+              todosRequest,
+              RequestState.inProgress,
+              RequestType.read
+            ) && <CircularProgress />}
+          </Wrap>
 
           {isMatching(todosRequest, RequestState.error, RequestType.read) && (
             <Typography color="error">Failed to load todos</Typography>
-          )}
-
-          {isMatching(todosRequest, RequestState.success, RequestType.read) && (
-            <TodoList
-              items={todos}
-              onItemUpdate={updateTodo}
-              onItemDelete={deleteTodo}
-              onItemDeleteCancel={deleteTodoCancel}
-            />
           )}
         </div>
       </Content>

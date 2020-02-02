@@ -1,3 +1,5 @@
+import uuidv4 from "uuid/v4";
+
 import { Item } from "@modules/common/models";
 
 export interface TodoData {
@@ -9,7 +11,7 @@ export interface TodoItem extends TodoData, Item {}
 
 export function createTodo(data: TodoData): TodoItem {
   return {
-    id: Math.random(),
+    id: uuidv4(),
     completed: data.completed ?? false,
     text: data.text,
   };
