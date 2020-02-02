@@ -49,7 +49,9 @@ export function setRequest<T extends WithRequest<P>, P>(
     return { ...item, [requestSymbol]: request };
   }
 
-  return item;
+  throw new Error("Forbidden state change!");
+
+  // return item;
 }
 
 export function setRequestMutable<T extends WithRequest<P>, P>(

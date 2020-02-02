@@ -7,11 +7,10 @@ import {
   mergeMap,
   startWith,
   takeUntil,
-  delay,
-  repeat,
+  switchMapTo,
 } from "rxjs/operators";
 import { ajax } from "rxjs/ajax";
-import { from, of } from "rxjs";
+import { from, of, timer } from "rxjs";
 
 import { actions } from "./slice";
 import { createTodo } from "./models";
@@ -56,29 +55,38 @@ const addTodoEpic: Epic = action$ =>
 const removeTodoEpic: Epic = action$ =>
   action$.pipe(
     filter(actions.removeTodo.match),
-    delay(DELAY_TIME),
     switchMap(action =>
-      from(
-        ajax({
-          url: `http://localhost:5000/todos/${action.payload.item.id}`,
-          method: "DELETE",
-        })
-      ).pipe(
-        map(() => actions.removeTodoDone(action.payload)),
-        startWith(actions.removeTodoInProgress(action.payload)),
-        catchError((error: Error) =>
-          of(actions.removeTodoError({ ...action.payload, error }))
+      from(timer(DELAY_TIME)).pipe(
+        switchMapTo(
+          from(
+            ajax({
+              url: `http://localhost:5000/todos/${action.payload.item.id}`,
+              method: "DELETE",
+            })
+          ).pipe(
+            map(() => actions.removeTodoDone(action.payload)),
+            startWith(actions.removeTodoInProgress(action.payload)),
+            catchError((error: Error) =>
+              of(actions.removeTodoError({ ...action.payload, error }))
+            )
+          )
+        ),
+        takeUntil(
+          action$.pipe(
+            filter(actions.removeTodoCancel.match),
+            filter(
+              cancelAction =>
+                action.payload.item.id === cancelAction.payload.item.id
+            )
+          )
         )
       )
-    ),
-    takeUntil(action$.pipe(filter(actions.removeTodoCancel.match))),
-    repeat()
+    )
   );
 
 const updateTodoEpic: Epic = action$ =>
   action$.pipe(
     filter(actions.updateTodo.match),
-    takeUntil(action$.pipe(filter(actions.updateTodoCancel.match))),
     mergeMap(action =>
       from(
         ajax({
