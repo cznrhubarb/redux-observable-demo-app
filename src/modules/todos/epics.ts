@@ -21,7 +21,7 @@ import {
   isOfType,
   isInState,
 } from "@modules/common/request";
-import { actions } from "./slice";
+import { actions, TodoState } from "./slice";
 import { createTodo, TodoData } from "./models";
 
 const DELAY_TIME = 3000;
@@ -56,7 +56,8 @@ const loadTodosEpic: Epic = (_, state$) =>
 
 const addTodoEpic: Epic = (_, state$) =>
   state$.pipe(
-    map(s => getRequest<TodoData>(s.todos)),
+    map(s => s.todos as TodoState),
+    map(s => getRequest(s)),
     filter(request => isOfType(request, RequestType.create)),
     filter(request => isInState(request, [RequestState.initial])),
     distinctUntilChanged(),
