@@ -12,18 +12,23 @@
     },
     {
       "id": "fb660a00-5856-4f42-80e4-36402221b19d",
-      "completed": true,
+      "completed": false,
       "text": "Todo 3"
     },
     {
       "id": "9d50f59f-966f-4858-9a7c-b4296380ed07",
-      "completed": true,
+      "completed": false,
       "text": "Todo 4"
     },
     {
       "id": "4fa71d1f-431f-402e-aa3c-6b102e30b396",
       "completed": false,
       "text": "Todo 5"
+    },
+    {
+      "id": "49031e79-c2ce-4150-bd26-a2d883d7ecd5",
+      "completed": false,
+      "text": "Todo 6"
     }
   ]
 }

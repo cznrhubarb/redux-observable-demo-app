@@ -16,17 +16,14 @@ export enum RequestType {
   delete = "delete",
 }
 
-export type GenericRequest<P = undefined> = {
-  readonly type: RequestType;
-  state: RequestState;
-  payload?: P;
-  error?: Error;
-};
-
 export type RequestUpdate = {
   readonly type: RequestType;
   state: RequestState;
   error?: Error;
+};
+
+export type GenericRequest<P = undefined> = RequestUpdate & {
+  payload?: P;
 };
 
 export const EmptyRequest: GenericRequest<never> = {
@@ -136,8 +133,10 @@ export function updateRequest<T extends WithRequest<P>, P>(
     isOfType(getRequest(item), update.type) &&
     isInState(getRequest(item), [RequestState.initial, RequestState.inProgress])
   ) {
+    const payload: P = getRequest(item)?.payload as P;
+    const updatedRequest = { ...update, payload } as Request<P>;
     // eslint-disable-next-line no-param-reassign
-    item[requestSymbol] = update;
+    item[requestSymbol] = updatedRequest;
   }
 
   return item;
