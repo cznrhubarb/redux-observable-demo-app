@@ -8,18 +8,43 @@ import {
   startWith,
   takeUntil,
   switchMapTo,
+  distinctUntilChanged,
 } from "rxjs/operators";
 import { ajax } from "rxjs/ajax";
 import { from, of, timer } from "rxjs";
 
+import {
+  getRequest,
+  isMatching,
+  RequestState,
+  RequestType,
+  isOfType,
+  isInState,
+} from "@modules/common/request";
 import { actions } from "./slice";
-import { createTodo } from "./models";
+import { createTodo, TodoData } from "./models";
 
 const DELAY_TIME = 3000;
 
-const loadTodosEpic: Epic = action$ =>
-  action$.pipe(
-    filter(actions.loadTodos.match),
+// const loadTodosEpic: Epic = action$ =>
+//   action$.pipe(
+//     filter(actions.loadTodos.match),
+//     switchMap(() =>
+//       from(ajax({ url: "http://localhost:5000/todos", method: "GET" })).pipe(
+//         map(response => actions.loadTodosDone(response.response)),
+//         startWith(actions.loadTodosInProgress()),
+//         catchError((error: Error) => of(actions.loadTodosError({ error })))
+//       )
+//     )
+//   );
+
+const loadTodosEpic: Epic = (_, state$) =>
+  state$.pipe(
+    map(s => getRequest<void>(s.todos)),
+    filter(request =>
+      isMatching(request, RequestState.initial, RequestType.read)
+    ),
+    distinctUntilChanged(),
     switchMap(() =>
       from(ajax({ url: "http://localhost:5000/todos", method: "GET" })).pipe(
         map(response => actions.loadTodosDone(response.response)),
@@ -29,28 +54,54 @@ const loadTodosEpic: Epic = action$ =>
     )
   );
 
-const addTodoEpic: Epic = action$ =>
-  action$.pipe(
-    filter(actions.addTodo.match),
-    mergeMap(action =>
+const addTodoEpic: Epic = (_, state$) =>
+  state$.pipe(
+    map(s => getRequest<TodoData>(s.todos)),
+    filter(request => isOfType(request, RequestType.create)),
+    filter(request => isInState(request, [RequestState.initial])),
+    distinctUntilChanged(),
+    switchMap(r =>
       from(
         ajax({
           url: "http://localhost:5000/todos",
           method: "POST",
-          body: createTodo(action.payload),
+          body: createTodo(r.payload as TodoData),
           headers: {
             "Content-Type": "application/json",
           },
         })
       ).pipe(
         map(response => actions.addTodoDone(response.response)),
-        startWith(actions.addTodoInProgress(action.payload)),
+        startWith(actions.addTodoInProgress()),
         catchError((error: Error) =>
-          of(actions.addTodoError({ ...action.payload, error }))
+          of(actions.addTodoError({ ...r.payload, error }))
         )
       )
     )
   );
+
+// const addTodoEpic: Epic = action$ =>
+//   action$.pipe(
+//     filter(actions.addTodo.match),
+//     mergeMap(action =>
+//       from(
+//         ajax({
+//           url: "http://localhost:5000/todos",
+//           method: "POST",
+//           body: createTodo(action.payload),
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//         })
+//       ).pipe(
+//         map(response => actions.addTodoDone(response.response)),
+//         startWith(actions.addTodoInProgress(action.payload)),
+//         catchError((error: Error) =>
+//           of(actions.addTodoError({ ...action.payload, error }))
+//         )
+//       )
+//     )
+//   );
 
 const removeTodoEpic: Epic = action$ =>
   action$.pipe(

@@ -5,16 +5,18 @@ import {
   ItemWithRequest,
   RequestType,
   RequestState,
-  setRequestMutable,
+  setRequest,
+  updateRequest,
   setRequestOnListItem,
+  updateRequestOnListItem,
 } from "@modules/common/request";
 import { TodoItem, TodoData } from "./models";
 
-export interface TodoItemState extends TodoItem, ItemWithRequest {}
+export type TodoItemState = TodoItem & ItemWithRequest<TodoData>;
 
-export interface TodoState extends WithRequest<TodoData> {
+export type TodoState = WithRequest<TodoData> & {
   todos: TodoItemState[];
-}
+};
 
 export const initialState: TodoState = {
   todos: [],
@@ -26,21 +28,21 @@ const slice = createSlice({
   initialState,
   reducers: {
     loadTodos(state: TodoState) {
-      setRequestMutable(state, {
+      setRequest(state, {
         type: RequestType.read,
         state: RequestState.initial,
       });
     },
 
     loadTodosInProgress(state: TodoState) {
-      setRequestMutable(state, {
+      updateRequest(state, {
         type: RequestType.read,
         state: RequestState.inProgress,
       });
     },
 
     loadTodosDone(state: TodoState, action: PayloadAction<TodoItem[]>) {
-      setRequestMutable(state, {
+      updateRequest(state, {
         type: RequestType.read,
         state: RequestState.success,
       });
@@ -49,7 +51,7 @@ const slice = createSlice({
     },
 
     loadTodosError(state: TodoState, action: PayloadAction<{ error: Error }>) {
-      setRequestMutable(state, {
+      updateRequest(state, {
         error: action.payload.error,
         type: RequestType.read,
         state: RequestState.error,
@@ -57,23 +59,22 @@ const slice = createSlice({
     },
 
     addTodo(state: TodoState, action: PayloadAction<TodoData>) {
-      setRequestMutable(state, {
+      setRequest(state, {
         type: RequestType.create,
         state: RequestState.initial,
         payload: action.payload,
       });
     },
 
-    addTodoInProgress(state: TodoState, action: PayloadAction<TodoData>) {
-      setRequestMutable(state, {
+    addTodoInProgress(state: TodoState) {
+      updateRequest(state, {
         type: RequestType.create,
         state: RequestState.inProgress,
-        payload: action.payload,
       });
     },
 
     addTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
-      setRequestMutable(state, {
+      updateRequest(state, {
         type: RequestType.create,
         state: RequestState.success,
       });
@@ -82,7 +83,7 @@ const slice = createSlice({
     },
 
     addTodoError(state: TodoState, action: PayloadAction<{ error: Error }>) {
-      setRequestMutable(state, {
+      updateRequest(state, {
         error: action.payload.error,
         type: RequestType.create,
         state: RequestState.error,
@@ -100,20 +101,28 @@ const slice = createSlice({
       state: TodoState,
       action: PayloadAction<{ item: TodoItem }>
     ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.delete,
-        state: RequestState.inProgress,
-      });
+      state.todos = updateRequestOnListItem(
+        state.todos,
+        action.payload.item.id,
+        {
+          type: RequestType.delete,
+          state: RequestState.inProgress,
+        }
+      );
     },
 
     removeTodoCancel(
       state: TodoState,
       action: PayloadAction<{ item: TodoItem }>
     ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.delete,
-        state: RequestState.canceled,
-      });
+      state.todos = updateRequestOnListItem(
+        state.todos,
+        action.payload.item.id,
+        {
+          type: RequestType.delete,
+          state: RequestState.canceled,
+        }
+      );
     },
 
     removeTodoDone(
@@ -127,11 +136,15 @@ const slice = createSlice({
       state: TodoState,
       action: PayloadAction<{ item: TodoItem; error: Error }>
     ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.delete,
-        state: RequestState.error,
-        error: action.payload.error,
-      });
+      state.todos = updateRequestOnListItem(
+        state.todos,
+        action.payload.item.id,
+        {
+          type: RequestType.delete,
+          state: RequestState.error,
+          error: action.payload.error,
+        }
+      );
     },
 
     updateTodo(
@@ -144,6 +157,7 @@ const slice = createSlice({
       state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
         type: RequestType.update,
         state: RequestState.initial,
+        payload: action.payload.data,
       });
     },
 
@@ -154,10 +168,14 @@ const slice = createSlice({
         data: Partial<TodoData>;
       }>
     ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.update,
-        state: RequestState.inProgress,
-      });
+      state.todos = updateRequestOnListItem(
+        state.todos,
+        action.payload.item.id,
+        {
+          type: RequestType.update,
+          state: RequestState.inProgress,
+        }
+      );
     },
 
     updateTodoCancel(
@@ -167,10 +185,14 @@ const slice = createSlice({
         data: Partial<TodoData>;
       }>
     ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.update,
-        state: RequestState.canceled,
-      });
+      state.todos = updateRequestOnListItem(
+        state.todos,
+        action.payload.item.id,
+        {
+          type: RequestType.update,
+          state: RequestState.canceled,
+        }
+      );
     },
 
     updateTodoDone(
@@ -180,10 +202,14 @@ const slice = createSlice({
         data: Partial<TodoData>;
       }>
     ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.update,
-        state: RequestState.success,
-      });
+      state.todos = updateRequestOnListItem(
+        state.todos,
+        action.payload.item.id,
+        {
+          type: RequestType.update,
+          state: RequestState.success,
+        }
+      );
 
       const itemIndex = state.todos.findIndex(
         i => i.id === action.payload.item.id
@@ -205,11 +231,15 @@ const slice = createSlice({
         error: Error;
       }>
     ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.update,
-        state: RequestState.error,
-        error: action.payload.error,
-      });
+      state.todos = updateRequestOnListItem(
+        state.todos,
+        action.payload.item.id,
+        {
+          type: RequestType.update,
+          state: RequestState.error,
+          error: action.payload.error,
+        }
+      );
     },
   },
 });

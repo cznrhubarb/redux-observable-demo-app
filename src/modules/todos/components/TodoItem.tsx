@@ -20,15 +20,17 @@ import {
   RequestType,
 } from "@modules/common/request";
 
-export interface Props {
+import { TodoData } from "../models";
+
+export type Props = {
   text: string;
   checked?: boolean;
   divider?: boolean;
   onDeleteButtonClick?: () => void;
   onCancelButtonClick?: () => void;
   onCheckBoxToggle?: () => void;
-  request?: Request;
-}
+  request?: Request<TodoData>;
+};
 
 const TodoListItem: React.FC<Props> = props => {
   const {

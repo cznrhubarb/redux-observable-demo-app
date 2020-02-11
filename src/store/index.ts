@@ -10,9 +10,9 @@ import {
   initialState as todosInitialState,
 } from "@modules/todos";
 
-export interface AppState {
+export type AppState = {
   todos: TodoState;
-}
+};
 
 export const initialState: AppState = {
   todos: todosInitialState,

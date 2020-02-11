@@ -2,12 +2,12 @@ import uuidv4 from "uuid/v4";
 
 import { Item } from "@modules/common/models";
 
-export interface TodoData {
+export type TodoData = {
   text: string;
   completed?: boolean;
-}
+};
 
-export interface TodoItem extends TodoData, Item {}
+export type TodoItem = TodoData & Item;
 
 export function createTodo(data: TodoData): TodoItem {
   return {

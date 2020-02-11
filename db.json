@@ -6,14 +6,19 @@
       "text": "Todo 2"
     },
     {
-      "id": "48b5d86b-6677-4e0e-b575-874aa1030671",
-      "completed": false,
+      "id": "1e5aab94-9312-4294-a8f1-1906ed15f487",
+      "completed": true,
+      "text": "TOdo 1"
+    },
+    {
+      "id": "fb660a00-5856-4f42-80e4-36402221b19d",
+      "completed": true,
       "text": "Todo 3"
     },
     {
-      "id": "1e5aab94-9312-4294-a8f1-1906ed15f487",
-      "completed": false,
-      "text": "TOdo 1"
+      "id": "9d50f59f-966f-4858-9a7c-b4296380ed07",
+      "completed": true,
+      "text": "Todo 4"
     }
   ]
 }

@@ -9,27 +9,100 @@ export enum RequestState {
 }
 
 export enum RequestType {
+  none = "default",
   create = "create",
   read = "read",
   update = "update",
   delete = "delete",
 }
 
-export interface Request<P = void> {
-  type: RequestType | string;
+export type GenericRequest<P = undefined> = {
+  readonly type: RequestType;
   state: RequestState;
   payload?: P;
   error?: Error;
-}
+};
+
+export type RequestUpdate = {
+  readonly type: RequestType;
+  state: RequestState;
+  error?: Error;
+};
+
+export const EmptyRequest: GenericRequest<never> = {
+  type: RequestType.none,
+  state: RequestState.success,
+} as const;
+
+export type CreateRequest<P> = GenericRequest<P> & {
+  readonly type: RequestType.create;
+  payload: P;
+};
+
+export type ReadRequest<P> = GenericRequest<P> & {
+  readonly type: RequestType.read;
+};
+
+export type UpdateRequest<P> = GenericRequest<P> & {
+  readonly type: RequestType.update;
+  payload: P;
+};
+
+export type DeleteRequest<P> = GenericRequest<P> & {
+  readonly type: RequestType.delete;
+};
+
+export type Request<P> =
+  | typeof EmptyRequest
+  | CreateRequest<P>
+  | ReadRequest<P>
+  | UpdateRequest<P>
+  | DeleteRequest<P>;
 
 export const requestSymbol = Symbol("request");
 
-export interface WithRequest<P = void> {
+export type WithRequest<P> = {
   [requestSymbol]?: Request<P>;
+};
+
+export type ItemWithRequest<P> = Item & WithRequest<P>;
+
+export function getRequest<P>(item: WithRequest<P>): Request<P> {
+  return item[requestSymbol] ?? EmptyRequest;
 }
 
-export function getRequest<P>(item: WithRequest<P>): Request<P> | undefined {
-  return item[requestSymbol];
+export function hasRequest<P>(item: WithRequest<P>) {
+  return Boolean(getRequest(item));
+}
+
+export function isOfType<P, RT extends Request<P>>(
+  request: Request<P>,
+  type: RequestType
+): request is Request<P> extends { type: RequestType } ? RT : false {
+  return request.type === type;
+}
+
+export function isInState<P>(
+  request: Request<P>,
+  stateList: RequestState[]
+): boolean {
+  return stateList.includes(request.state);
+}
+
+export function isMatching<P>(
+  request: Request<P> | undefined,
+  state: RequestState | RequestState[],
+  type: RequestType
+): boolean {
+  if (!request) {
+    return false;
+  }
+
+  if (!isInState(request, Array.isArray(state) ? state : [state])) {
+    return false;
+  }
+
+  return isOfType(request, type);
 }
 
 export function setRequest<T extends WithRequest<P>, P>(
@@ -43,59 +116,57 @@ export function setRequest<T extends WithRequest<P>, P>(
     [RequestState.initial, RequestState.inProgress].includes(
       activeRequest.state
     );
+
   const sameRequestType = activeRequest?.type === request.type;
 
   if (!activeRequestInProgress || sameRequestType) {
-    return { ...item, [requestSymbol]: request };
+    // eslint-disable-next-line no-param-reassign
+    item[requestSymbol] = request;
   }
 
-  throw new Error("Forbidden state change!");
-
-  // return item;
+  return item;
 }
 
-export function setRequestMutable<T extends WithRequest<P>, P>(
+export function updateRequest<T extends WithRequest<P>, P>(
   item: T,
-  request: Request<P>
-): void {
-  const { [requestSymbol]: newRequest } = setRequest(item, request);
-  // eslint-disable-next-line no-param-reassign
-  item[requestSymbol] = newRequest;
+  update: RequestUpdate
+): T {
+  if (
+    hasRequest(item) &&
+    isOfType(getRequest(item), update.type) &&
+    isInState(getRequest(item), [RequestState.initial, RequestState.inProgress])
+  ) {
+    // eslint-disable-next-line no-param-reassign
+    item[requestSymbol] = update;
+  }
+
+  return item;
 }
 
-export interface ItemWithRequest extends Item, WithRequest {}
-
-export function setRequestOnListItem<T extends ItemWithRequest>(
+export function setRequestOnListItem<T extends ItemWithRequest<P>, P>(
   list: T[],
   itemId: T["id"],
-  request: Request
+  request: Request<P>
 ): T[] {
-  const itemIndex = list.findIndex(i => i.id === itemId);
-  if (itemIndex !== -1) {
-    return Object.assign([], list, {
-      [itemIndex]: setRequest(list[itemIndex], request),
-    });
+  const item = list.find(i => i.id === itemId);
+
+  if (item) {
+    setRequest(item, request);
   }
 
   return list;
 }
 
-export function isMatching<P>(
-  request: Request<P> | undefined,
-  state: RequestState | RequestState[],
-  type?: RequestType
-): boolean {
-  if (!request) {
-    return false;
+export function updateRequestOnListItem<T extends ItemWithRequest<P>, P>(
+  list: T[],
+  itemId: T["id"],
+  update: RequestUpdate
+): T[] {
+  const item = list.find(i => i.id === itemId);
+
+  if (item) {
+    updateRequest(item, update);
   }
 
-  if (type && request.type !== type) {
-    return false;
-  }
-
-  if (Array.isArray(state)) {
-    return state.length ? state.includes(request.state) : true;
-  }
-
-  return request.state === state;
+  return list;
 }

@@ -7,12 +7,12 @@ import TodoListItem from "./TodoItem";
 import { TodoItemState } from "../slice";
 import { TodoData } from "../models";
 
-export interface Props {
+export type Props = {
   items: TodoItemState[];
   onItemDelete: (item: TodoItemState) => void;
   onItemDeleteCancel: (item: TodoItemState) => void;
   onItemUpdate: (item: TodoItemState, data: Partial<TodoData>) => void;
-}
+};
 
 const TodoList: React.FC<Props> = props => {
   const { items } = props;
