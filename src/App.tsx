@@ -12,10 +12,14 @@ import {
   actions as todoActions,
   TodoItem,
   TodoList,
-  TodoState
+  TodoState,
 } from "@modules/todos";
 
-import { RequestState } from "@modules/common";
+import {
+  RequestState as RS,
+  RequestType as RT,
+  matchRequest,
+} from "@modules/common/requests";
 
 const Wrap = styled.div`
   display: flex;
@@ -38,7 +42,9 @@ const Divider = styled(MUDivider)`
 const App: React.FC = () => {
   const [desc, setDesc] = useState("");
   const textRef = useRef<HTMLInputElement>();
-  const todosState = useSelector<AppState, TodoState>(state => state.todos);
+  const todosState = useSelector<AppState, TodoState>(
+    state => state.todos
+  );
   const { todoRequests, loadingRequest } = todosState;
   const dispatch = useDispatch();
 
@@ -101,17 +107,19 @@ const App: React.FC = () => {
         <Divider />
 
         <div>
-          {loadingRequest === RequestState.inProgress && (
+          {matchRequest(RT.read, RS.inProgress)(loadingRequest) && (
             <Wrap>
               <CircularProgress />
             </Wrap>
           )}
 
-          {loadingRequest === RequestState.error && (
-            <Typography color="error">Failed to load todos</Typography>
+          {matchRequest(RT.read, RS.error)(loadingRequest) && (
+            <Typography color="error">
+              Failed to load todos
+            </Typography>
           )}
 
-          {loadingRequest === RequestState.success && (
+          {matchRequest(RT.read, RS.success)(loadingRequest) && (
             <>
               <TodoList
                 items={todoRequests}

@@ -6,13 +6,18 @@ import {
   IconButton,
   ListItemText,
   ListItemSecondaryAction,
-  CircularProgress
+  CircularProgress,
 } from "@material-ui/core";
 
 import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
 import RepeatRounded from "@material-ui/icons/RepeatRounded";
 
-import { Request, RequestState, RequestType } from "@modules/common";
+import {
+  Request,
+  RequestState as RS,
+  RequestType as RT,
+  matchRequest,
+} from "@modules/common/requests";
 import { TodoItem } from "../models";
 
 export interface Props {
@@ -31,14 +36,12 @@ const TodoListItem: React.FC<Props> = memo(props => {
     divider,
     onDeleteButtonClick,
     onCheckBoxToggle,
-    request
+    request,
   } = props;
 
   return (
     <ListItem divider={divider}>
-      {request &&
-      request.type === RequestType.update &&
-      request.state === RequestState.inProgress ? (
+      {matchRequest(RT.update, RS.inProgress)(request) ? (
         <CircularProgress size={42} color="secondary" />
       ) : (
         <Checkbox onClick={onCheckBoxToggle} checked={checked} />
@@ -46,29 +49,36 @@ const TodoListItem: React.FC<Props> = memo(props => {
 
       <ListItemText
         primary={text}
-        secondary={request && `Request ${request.type} ${request.state}`}
+        secondary={
+          request && `Request ${request.type} ${request.state}`
+        }
       />
 
-      {!request?.state || request.type !== RequestType.delete ? (
+      {!matchRequest(RT.delete, [RS.inProgress, RS.error])(
+        request
+      ) ? (
         <ListItemSecondaryAction>
-          <IconButton aria-label="Delete Todo" onClick={onDeleteButtonClick}>
+          <IconButton
+            aria-label="Delete Todo"
+            onClick={onDeleteButtonClick}
+          >
             <DeleteOutlined />
           </IconButton>
         </ListItemSecondaryAction>
       ) : null}
 
-      {request &&
-      request.type === RequestType.delete &&
-      request.state === RequestState.error ? (
+      {matchRequest(RT.delete, RS.error)(request) ? (
         <ListItemSecondaryAction>
-          <IconButton aria-label="Retry Todo" onClick={onDeleteButtonClick}>
+          <IconButton
+            aria-label="Retry Todo"
+            onClick={onDeleteButtonClick}
+          >
             <RepeatRounded />
           </IconButton>
         </ListItemSecondaryAction>
       ) : null}
 
-      {request?.type === RequestType.delete &&
-      request?.state === RequestState.inProgress ? (
+      {matchRequest(RT.delete, RS.inProgress)(request) ? (
         <ListItemSecondaryAction>
           <CircularProgress size={42} />
         </ListItemSecondaryAction>

@@ -27,8 +27,9 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "server": "json-server --watch db.json --port 5000 --delay 5000"
+    "server": "json-server --watch db.json --port 5000 --delay 5000",
+    "format": "prettier --config ./.prettierrc.js --check 'src/**/*' 'assets/**/*.json' --write",
+    "lint": "eslint ./src/**/*.{ts,tsx} --fix"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -57,8 +58,15 @@
     "eslint-config-airbnb-typescript-prettier": "^1.4.2",
     "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-plugin-jest": "^23.6.0",
+    "husky": "^4.2.3",
     "json-server": "^0.15.1",
+    "lint-staged": "^10.0.7",
     "prettier": "^1.19.1",
     "react-app-rewired": "^2.1.5"
+  },
+  "lint-staged": {
+    "client/**/*": ["prettier --write --check"],
+    "client/**/*.{ts,tsx}": ["eslint"],
+    "assets/**/*.json": ["prettier --write --check"]
   }
 }

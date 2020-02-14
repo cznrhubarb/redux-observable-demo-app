@@ -8,28 +8,9 @@ import {
   shareReplay,
   startWith,
   switchMap,
-  takeUntil
+  takeUntil,
 } from "rxjs/operators";
 
-export enum RequestState {
-  inProgress = "inProgress", // Request is processing
-  success = "success", // Request finished and succeeds
-  error = "error" // Request finished and failed
-}
-
-export enum RequestType {
-  create = "create",
-  read = "read",
-  update = "update",
-  delete = "delete"
-}
-
-export interface Request<P = unknown> {
-  type: RequestType | string;
-  state: RequestState;
-  payload: P;
-  error?: Error;
-}
 export const feedback = <State, Query>(
   query: (s: State) => Query | undefined,
   effect: (q: Query) => Observable<PayloadAction>
@@ -70,7 +51,3 @@ export const feedbackSet = <State, Query, P>(
     )
   );
 };
-
-export const matchRequest = (type: RequestType, state: RequestState) => (
-  request: Request
-) => request.type === type && request.state === state;

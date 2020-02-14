@@ -1,45 +1,27 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { RequestState, RequestType, Request } from "@modules/common";
+import {
+  RequestState,
+  RequestType,
+  Request,
+  createRequest,
+  updateRequest,
+} from "@modules/common/requests";
 import { TodoItem, TodoData, createTodo } from "./models";
 
 export interface TodoState {
-  loadingRequest: RequestState;
+  loadingRequest: Request;
   todoRequests: Request<TodoItem>[];
 }
 
 export const initialState: TodoState = {
-  loadingRequest: RequestState.inProgress,
-  todoRequests: []
+  loadingRequest: createRequest(
+    undefined,
+    RequestType.read,
+    RequestState.inProgress
+  ),
+  todoRequests: [],
 };
-
-const createRequest = <T>(
-  payload: T,
-  type: RequestType = RequestType.create,
-  state: RequestState = RequestState.inProgress
-) => ({
-  type,
-  state,
-  payload
-});
-
-const canUpdate = <T>(request: Request<T>, type?: RequestType) =>
-  request.state === RequestState.inProgress ? request.type === type : true;
-
-const updateRequest = <T>(
-  request: Request<T>,
-  state?: RequestState,
-  type?: RequestType,
-  error?: string // Error object is not serializable
-) =>
-  canUpdate(request, type)
-    ? ({
-        ...request,
-        state,
-        error,
-        type
-      } as Request<T>)
-    : request;
 
 // State is wrapped with immer produce so it can be mutated but the end result will be immutable
 const slice = createSlice({
@@ -47,28 +29,49 @@ const slice = createSlice({
   initialState,
   reducers: {
     loadTodos(state: TodoState) {
-      state.loadingRequest = RequestState.inProgress;
+      state.loadingRequest = updateRequest(
+        state.loadingRequest,
+        RequestState.inProgress,
+        RequestType.read
+      );
     },
 
-    loadTodosDone(state: TodoState, action: PayloadAction<TodoItem[]>) {
-      state.loadingRequest = RequestState.success;
+    loadTodosDone(
+      state: TodoState,
+      action: PayloadAction<TodoItem[]>
+    ) {
+      state.loadingRequest = updateRequest(
+        state.loadingRequest,
+        RequestState.success,
+        RequestType.read
+      );
       state.todoRequests = action.payload.map(todo =>
         createRequest(todo, RequestType.read, RequestState.success)
       );
     },
 
     loadTodosError(state: TodoState) {
-      state.loadingRequest = RequestState.error;
+      state.loadingRequest = updateRequest(
+        state.loadingRequest,
+        RequestState.error,
+        RequestType.read
+      );
     },
 
     addTodo(state: TodoState, action: PayloadAction<TodoData>) {
-      state.todoRequests.push(createRequest(createTodo(action.payload)));
+      state.todoRequests.push(
+        createRequest(createTodo(action.payload))
+      );
     },
 
     addTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
-          ? updateRequest(request, RequestState.success, RequestType.create)
+          ? updateRequest(
+              request,
+              RequestState.success,
+              RequestType.create
+            )
           : request
       );
     },
@@ -76,7 +79,11 @@ const slice = createSlice({
     addTodoError(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
-          ? updateRequest(request, RequestState.error, RequestType.create)
+          ? updateRequest(
+              request,
+              RequestState.error,
+              RequestType.create
+            )
           : request
       );
     },
@@ -84,12 +91,19 @@ const slice = createSlice({
     removeTodo(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
-          ? updateRequest(request, RequestState.inProgress, RequestType.delete)
+          ? updateRequest(
+              request,
+              RequestState.inProgress,
+              RequestType.delete
+            )
           : request
       );
     },
 
-    removeTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
+    removeTodoDone(
+      state: TodoState,
+      action: PayloadAction<TodoItem>
+    ) {
       state.todoRequests = state.todoRequests.filter(
         request => request.payload.id !== action.payload.id
       );
@@ -114,12 +128,19 @@ const slice = createSlice({
     updateTodo(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
-          ? updateRequest(request, RequestState.inProgress, RequestType.update)
+          ? updateRequest(
+              request,
+              RequestState.inProgress,
+              RequestType.update
+            )
           : request
       );
     },
 
-    updateTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
+    updateTodoDone(
+      state: TodoState,
+      action: PayloadAction<TodoItem>
+    ) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
           ? updateRequest(
@@ -149,8 +170,8 @@ const slice = createSlice({
 
     reset() {
       return initialState;
-    }
-  }
+    },
+  },
 });
 
 export const { reducer, actions } = slice;
