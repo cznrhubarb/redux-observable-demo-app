@@ -30,7 +30,7 @@ const updateRequest = <T>(
   request: Request<T>,
   state?: RequestState,
   type?: RequestType,
-  error?: Error
+  error?: string // Error object is not serializable
 ) =>
   canUpdate(request, type)
     ? ({
@@ -105,7 +105,7 @@ const slice = createSlice({
               request,
               RequestState.error,
               RequestType.delete,
-              action.payload.error
+              action.payload.error.message
             )
           : request
       );
@@ -126,6 +126,22 @@ const slice = createSlice({
               { ...request, payload: action.payload },
               RequestState.success,
               RequestType.update
+            )
+          : request
+      );
+    },
+
+    updateTodoError(
+      state: TodoState,
+      action: PayloadAction<{ item: TodoItem; error: Error }>
+    ) {
+      state.todoRequests = state.todoRequests.map(request =>
+        request.payload.id === action.payload.item.id
+          ? updateRequest(
+              request,
+              RequestState.error,
+              RequestType.update,
+              action.payload.error.message
             )
           : request
       );

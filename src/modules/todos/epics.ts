@@ -30,7 +30,11 @@ const loadTodosEpic: Epic = (_, state$: StateObservable<AppState>) =>
 const updateTodoEpic: Epic = (_, state$: StateObservable<AppState>) =>
   state$.pipe(
     map(s => s.todos),
-    feedbackSet<TodoState, Request<TodoItem>, TodoItem>(
+    feedbackSet<
+      TodoState,
+      Request<TodoItem>,
+      TodoItem | { item: TodoItem; error: Error }
+    >(
       s => s.todoRequests.filter(matchRequest(RT.update, RS.inProgress)),
       request =>
         ajax({
@@ -43,7 +47,9 @@ const updateTodoEpic: Epic = (_, state$: StateObservable<AppState>) =>
         }).pipe(
           retry(3),
           map(() => actions.updateTodoDone(request.payload)),
-          catchError(() => of(actions.addTodoError(request.payload)))
+          catchError(e =>
+            of(actions.updateTodoError({ item: request.payload, error: e }))
+          )
         )
     )
   );
