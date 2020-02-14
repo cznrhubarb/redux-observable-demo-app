@@ -64,6 +64,11 @@
     "prettier": "^1.19.1",
     "react-app-rewired": "^2.1.5"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "lint-staged": {
     "client/**/*": ["prettier --write --check"],
     "client/**/*.{ts,tsx}": ["eslint"],
