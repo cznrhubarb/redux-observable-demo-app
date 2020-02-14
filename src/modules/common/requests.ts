@@ -36,13 +36,8 @@ export const createRequest = <T>(
   payload,
 });
 
-export const canUpdate = <T>(
-  request: Request<T>,
-  type?: RequestType
-) =>
-  request.state === RequestState.inProgress
-    ? request.type === type
-    : true;
+export const canUpdate = <T>(request: Request<T>, type?: RequestType) =>
+  request.state === RequestState.inProgress ? request.type === type : true;
 
 export const updateRequest = <T>(
   request: Request<T>,

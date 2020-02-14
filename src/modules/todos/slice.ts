@@ -36,10 +36,7 @@ const slice = createSlice({
       );
     },
 
-    loadTodosDone(
-      state: TodoState,
-      action: PayloadAction<TodoItem[]>
-    ) {
+    loadTodosDone(state: TodoState, action: PayloadAction<TodoItem[]>) {
       state.loadingRequest = updateRequest(
         state.loadingRequest,
         RequestState.success,
@@ -59,19 +56,13 @@ const slice = createSlice({
     },
 
     addTodo(state: TodoState, action: PayloadAction<TodoData>) {
-      state.todoRequests.push(
-        createRequest(createTodo(action.payload))
-      );
+      state.todoRequests.push(createRequest(createTodo(action.payload)));
     },
 
     addTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
-          ? updateRequest(
-              request,
-              RequestState.success,
-              RequestType.create
-            )
+          ? updateRequest(request, RequestState.success, RequestType.create)
           : request
       );
     },
@@ -79,11 +70,7 @@ const slice = createSlice({
     addTodoError(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
-          ? updateRequest(
-              request,
-              RequestState.error,
-              RequestType.create
-            )
+          ? updateRequest(request, RequestState.error, RequestType.create)
           : request
       );
     },
@@ -91,19 +78,12 @@ const slice = createSlice({
     removeTodo(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
-          ? updateRequest(
-              request,
-              RequestState.inProgress,
-              RequestType.delete
-            )
+          ? updateRequest(request, RequestState.inProgress, RequestType.delete)
           : request
       );
     },
 
-    removeTodoDone(
-      state: TodoState,
-      action: PayloadAction<TodoItem>
-    ) {
+    removeTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.filter(
         request => request.payload.id !== action.payload.id
       );
@@ -128,19 +108,12 @@ const slice = createSlice({
     updateTodo(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
-          ? updateRequest(
-              request,
-              RequestState.inProgress,
-              RequestType.update
-            )
+          ? updateRequest(request, RequestState.inProgress, RequestType.update)
           : request
       );
     },
 
-    updateTodoDone(
-      state: TodoState,
-      action: PayloadAction<TodoItem>
-    ) {
+    updateTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
           ? updateRequest(

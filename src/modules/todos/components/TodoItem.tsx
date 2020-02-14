@@ -49,19 +49,12 @@ const TodoListItem: React.FC<Props> = memo(props => {
 
       <ListItemText
         primary={text}
-        secondary={
-          request && `Request ${request.type} ${request.state}`
-        }
+        secondary={request && `Request ${request.type} ${request.state}`}
       />
 
-      {!matchRequest(RT.delete, [RS.inProgress, RS.error])(
-        request
-      ) ? (
+      {!matchRequest(RT.delete, [RS.inProgress, RS.error])(request) ? (
         <ListItemSecondaryAction>
-          <IconButton
-            aria-label="Delete Todo"
-            onClick={onDeleteButtonClick}
-          >
+          <IconButton aria-label="Delete Todo" onClick={onDeleteButtonClick}>
             <DeleteOutlined />
           </IconButton>
         </ListItemSecondaryAction>
@@ -69,10 +62,7 @@ const TodoListItem: React.FC<Props> = memo(props => {
 
       {matchRequest(RT.delete, RS.error)(request) ? (
         <ListItemSecondaryAction>
-          <IconButton
-            aria-label="Retry Todo"
-            onClick={onDeleteButtonClick}
-          >
+          <IconButton aria-label="Retry Todo" onClick={onDeleteButtonClick}>
             <RepeatRounded />
           </IconButton>
         </ListItemSecondaryAction>

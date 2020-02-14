@@ -42,9 +42,7 @@ const Divider = styled(MUDivider)`
 const App: React.FC = () => {
   const [desc, setDesc] = useState("");
   const textRef = useRef<HTMLInputElement>();
-  const todosState = useSelector<AppState, TodoState>(
-    state => state.todos
-  );
+  const todosState = useSelector<AppState, TodoState>(state => state.todos);
   const { todoRequests, loadingRequest } = todosState;
   const dispatch = useDispatch();
 
@@ -114,9 +112,7 @@ const App: React.FC = () => {
           )}
 
           {matchRequest(RT.read, RS.error)(loadingRequest) && (
-            <Typography color="error">
-              Failed to load todos
-            </Typography>
+            <Typography color="error">Failed to load todos</Typography>
           )}
 
           {matchRequest(RT.read, RS.success)(loadingRequest) && (

@@ -24,9 +24,7 @@ const TodoList: React.FC<Props> = memo(props => (
               request={todo}
               checked={Boolean(todo.payload.completed)}
               divider={idx !== props.items.length - 1}
-              onDeleteButtonClick={() =>
-                props.onItemDelete(todo.payload)
-              }
+              onDeleteButtonClick={() => props.onItemDelete(todo.payload)}
               onCheckBoxToggle={() =>
                 props.onItemUpdate({
                   ...todo.payload,

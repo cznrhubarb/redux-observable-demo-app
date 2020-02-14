@@ -1,8 +1,5 @@
 import { combineReducers } from "redux";
-import {
-  configureStore,
-  getDefaultMiddleware,
-} from "@reduxjs/toolkit";
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { combineEpics, createEpicMiddleware } from "redux-observable";
 import { createLogger } from "redux-logger";
 
@@ -34,11 +31,7 @@ export function createStore() {
   const epicMiddleware = createEpicMiddleware();
   const rootEpic = combineEpics(todosEpics);
 
-  const middleware = [
-    ...getDefaultMiddleware(),
-    epicMiddleware,
-    logger,
-  ];
+  const middleware = [...getDefaultMiddleware(), epicMiddleware, logger];
 
   const store = configureStore({
     reducer,

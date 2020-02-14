@@ -1,8 +1,4 @@
-import {
-  combineEpics,
-  Epic,
-  StateObservable,
-} from "redux-observable";
+import { combineEpics, Epic, StateObservable } from "redux-observable";
 import { catchError, map, retry } from "rxjs/operators";
 import { Observable, of } from "rxjs";
 import { ajax, ajaxGet } from "rxjs/internal-compatibility";
@@ -40,8 +36,7 @@ const updateTodoEpic: Epic = (_, state$: StateObservable<AppState>) =>
       Request<TodoItem>,
       TodoItem | { item: TodoItem; error: Error }
     >(
-      s =>
-        s.todoRequests.filter(matchRequest(RT.update, RS.inProgress)),
+      s => s.todoRequests.filter(matchRequest(RT.update, RS.inProgress)),
       request =>
         ajax({
           url: `http://localhost:5000/todos/${request.payload.id}`,
@@ -69,8 +64,7 @@ const addTodoEpic: Epic = (_, state$: Observable<AppState>) =>
   state$.pipe(
     map(s => s.todos),
     feedbackSet<TodoState, Request<TodoItem>, TodoItem>(
-      s =>
-        s.todoRequests.filter(matchRequest(RT.create, RS.inProgress)),
+      s => s.todoRequests.filter(matchRequest(RT.create, RS.inProgress)),
       request =>
         ajax({
           url: "http://localhost:5000/todos",
@@ -94,8 +88,7 @@ const removeTodoEpic: Epic = (_, state$: Observable<AppState>) =>
       Request<TodoItem>,
       TodoItem | { item: TodoItem; error: Error }
     >(
-      s =>
-        s.todoRequests.filter(matchRequest(RT.delete, RS.inProgress)),
+      s => s.todoRequests.filter(matchRequest(RT.delete, RS.inProgress)),
       request =>
         ajax({
           url: `http://localhost:5000/todos/${request.payload.id}`,
