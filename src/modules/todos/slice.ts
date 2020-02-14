@@ -53,7 +53,7 @@ const slice = createSlice({
     loadTodosDone(state: TodoState, action: PayloadAction<TodoItem[]>) {
       state.loadingRequest = RequestState.success;
       state.todoRequests = action.payload.map(todo =>
-        createRequest(todo, RequestType.create, RequestState.success)
+        createRequest(todo, RequestType.read, RequestState.success)
       );
     },
 

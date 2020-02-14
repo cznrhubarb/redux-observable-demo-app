@@ -19,6 +19,7 @@ export enum RequestState {
 
 export enum RequestType {
   create = "create",
+  read = "read",
   update = "update",
   delete = "delete"
 }

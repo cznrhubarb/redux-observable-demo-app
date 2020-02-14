@@ -119,14 +119,14 @@ const App: React.FC = () => {
                 onItemDelete={deleteTodo}
                 onItemDeleteCancel={deleteTodoCancel}
               />
-
-              <Wrap>
-                <Button onClick={onReset} color="primary">
-                  Reload
-                </Button>
-              </Wrap>
             </>
           )}
+
+          <Wrap>
+            <Button onClick={onReset} color="primary">
+              Reload
+            </Button>
+          </Wrap>
         </div>
       </Content>
     </Wrap>
