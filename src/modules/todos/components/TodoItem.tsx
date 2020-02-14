@@ -10,19 +10,18 @@ import {
 } from "@material-ui/core";
 
 import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
-import CancelOutlined from "@material-ui/icons/CancelOutlined";
 import RepeatRounded from "@material-ui/icons/RepeatRounded";
 
-import { Request, RequestState, RequestType } from "../slice";
+import { Request, RequestState, RequestType } from "@modules/common";
+import { TodoItem } from "@modules/todos";
 
 export interface Props {
   text: string;
   checked?: boolean;
   divider?: boolean;
   onDeleteButtonClick?: () => void;
-  onCancelButtonClick?: () => void;
   onCheckBoxToggle?: () => void;
-  request?: Request;
+  request?: Request<TodoItem>;
 }
 
 const TodoListItem: React.FC<Props> = memo(props => {
@@ -31,7 +30,6 @@ const TodoListItem: React.FC<Props> = memo(props => {
     checked,
     divider,
     onDeleteButtonClick,
-    onCancelButtonClick,
     onCheckBoxToggle,
     request
   } = props;
@@ -40,9 +38,7 @@ const TodoListItem: React.FC<Props> = memo(props => {
     <ListItem divider={divider}>
       {request &&
       request.type === RequestType.update &&
-      [RequestState.initial, RequestState.in_progress].includes(
-        request.state
-      ) ? (
+      request.state === RequestState.in_progress ? (
         <CircularProgress size={42} color="secondary" />
       ) : (
         <Checkbox onClick={onCheckBoxToggle} checked={checked} />
@@ -63,19 +59,10 @@ const TodoListItem: React.FC<Props> = memo(props => {
 
       {request &&
       request.type === RequestType.delete &&
-      [RequestState.error, RequestState.canceled].includes(request.state) ? (
+      request.state === RequestState.error ? (
         <ListItemSecondaryAction>
           <IconButton aria-label="Retry Todo" onClick={onDeleteButtonClick}>
             <RepeatRounded />
-          </IconButton>
-        </ListItemSecondaryAction>
-      ) : null}
-
-      {request?.type === RequestType.delete &&
-      request?.state === RequestState.initial ? (
-        <ListItemSecondaryAction>
-          <IconButton aria-label="Cancel" onClick={onCancelButtonClick}>
-            <CancelOutlined />
           </IconButton>
         </ListItemSecondaryAction>
       ) : null}

@@ -1,103 +1,118 @@
-import { combineEpics, Epic } from "redux-observable";
+import { combineEpics, Epic, StateObservable } from "redux-observable";
+import { catchError, map, retry } from "rxjs/operators";
+import { Observable, of } from "rxjs";
+import { ajax, ajaxGet } from "rxjs/internal-compatibility";
+import { AppState } from "@store/index";
+import { TodoItem } from "@modules/todos/models";
 import {
-  switchMap,
-  map,
-  catchError,
-  filter,
-  mergeMap,
-  startWith,
-  takeUntil,
-  repeat,
-  delay
-} from "rxjs/operators";
-import { ajax } from "rxjs/ajax";
-import { from, of } from "rxjs";
+  feedback,
+  feedbackSet,
+  RequestState,
+  RequestType,
+  Request
+} from "@modules/common";
+import { actions, TodoState } from "./slice";
 
-import { actions } from "./slice";
-import { createTodo } from "./models";
-
-const DELAY_TIME = 3000;
-
-const loadTodosEpic: Epic = action$ =>
-  action$.pipe(
-    filter(actions.loadTodos.match),
-    switchMap(() =>
-      from(ajax({ url: "http://localhost:5000/todos", method: "GET" })).pipe(
-        map(response => actions.loadTodosDone(response.response)),
-        catchError(() => of(actions.loadTodosError()))
-      )
+const loadTodosEpic: Epic = (_, state$: StateObservable<AppState>) =>
+  state$.pipe(
+    map(state => state.todos),
+    feedback(
+      s => (s.loadingRequest === RequestState.in_progress ? {} : undefined),
+      _ =>
+        ajaxGet("http://localhost:5000/todos").pipe(
+          retry(3),
+          map(response => actions.loadTodosDone(response.response)),
+          catchError(() => of(actions.loadTodosError()))
+        )
     )
   );
 
-const addTodoEpic: Epic = action$ =>
-  action$.pipe(
-    filter(actions.addTodo.match),
-    mergeMap(action =>
-      from(
+const updateTodoEpic: Epic = (_, state$: StateObservable<AppState>) =>
+  state$.pipe(
+    map(s => s.todos),
+    feedbackSet<TodoState, Request<TodoItem>, TodoItem>(
+      s =>
+        new Set(
+          s.todoRequests.filter(
+            r =>
+              r.state === RequestState.in_progress &&
+              r.type === RequestType.update
+          )
+        ),
+      request =>
+        ajax({
+          url: `http://localhost:5000/todos/${request.payload.id}`,
+          method: "PUT",
+          body: request.payload, // Move update somewhere else
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }).pipe(
+          retry(3),
+          map(_ => actions.updateTodoDone(request.payload))
+        )
+    )
+  );
+
+const addTodoEpic: Epic = (_, state$: Observable<AppState>) =>
+  state$.pipe(
+    map(s => s.todos),
+    feedbackSet<TodoState, Request<TodoItem>, TodoItem>(
+      s =>
+        new Set(
+          s.todoRequests.filter(
+            r =>
+              r.type === RequestType.create &&
+              r.state === RequestState.in_progress
+          )
+        ),
+      request =>
         ajax({
           url: "http://localhost:5000/todos",
           method: "POST",
-          body: createTodo(action.payload),
+          body: request.payload,
           headers: {
             "Content-Type": "application/json"
           }
-        })
-      ).pipe(
-        map(response => actions.addTodoDone(response.response)),
-        catchError(() => of(actions.addTodoError()))
-      )
+        }).pipe(
+          map(r => actions.addTodoDone(r.response)),
+          catchError(() => of(actions.addTodoError(request.payload)))
+        )
     )
   );
 
-const removeTodoEpic: Epic = action$ =>
-  action$.pipe(
-    filter(actions.removeTodo.match),
-    delay(DELAY_TIME),
-    switchMap(action =>
-      from(
+const removeTodoEpic: Epic = (_, state$: Observable<AppState>) =>
+  state$.pipe(
+    map(s => s.todos),
+    feedbackSet<
+      TodoState,
+      Request<TodoItem>,
+      TodoItem | { item: TodoItem; error: Error }
+    >(
+      s =>
+        new Set(
+          s.todoRequests.filter(
+            r =>
+              r.type === RequestType.delete &&
+              r.state === RequestState.in_progress
+          )
+        ),
+      request =>
         ajax({
-          url: `http://localhost:5000/todos/${action.payload.item.id}`,
+          url: `http://localhost:5000/todos/${request.payload.id}`,
           method: "DELETE"
-        })
-      ).pipe(
-        map(() => actions.removeTodoDone(action.payload)),
-        startWith(actions.removeTodoInProgress(action.payload)),
-        catchError((error: Error) =>
-          of(actions.removeTodoError({ ...action.payload, error }))
+        }).pipe(
+          map(_ => actions.removeTodoDone(request.payload)),
+          catchError(e =>
+            of(actions.removeTodoError({ item: request.payload, error: e }))
+          )
         )
-      )
-    ),
-    takeUntil(action$.pipe(filter(actions.removeTodoCancel.match))),
-    repeat()
-  );
-
-const updateTodoEpic: Epic = action$ =>
-  action$.pipe(
-    filter(actions.updateTodo.match),
-    takeUntil(action$.pipe(filter(actions.updateTodoCancel.match))),
-    mergeMap(action =>
-      from(
-        ajax({
-          url: `http://localhost:5000/todos/${action.payload.item.id}`,
-          method: "PUT",
-          body: { ...action.payload.item, ...action.payload.data }, // Move update somewhere else
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-      ).pipe(
-        map(() => actions.updateTodoDone(action.payload)),
-        startWith(actions.updateTodoInProgress(action.payload)),
-        catchError((error: Error) =>
-          of(actions.updateTodoError({ ...action.payload, error }))
-        )
-      )
     )
   );
 
 export default combineEpics(
   loadTodosEpic,
+  updateTodoEpic,
   addTodoEpic,
-  removeTodoEpic,
-  updateTodoEpic
+  removeTodoEpic
 );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import Button from "@material-ui/core/Button";
@@ -10,14 +10,12 @@ import styled from "styled-components";
 
 import {
   actions as todoActions,
-  TodoState,
   TodoItem,
   TodoList,
-  TodoData,
-  TodoItemState
+  TodoState
 } from "@modules/todos";
-import { ApiStatus } from "@modules/common";
 import { AppState } from "@store/index";
+import {RequestState} from "@modules/common";
 
 const Wrap = styled.div`
   display: flex;
@@ -41,11 +39,11 @@ const App: React.FC = () => {
   const [desc, setDesc] = useState("");
   const textRef = useRef<HTMLInputElement>();
   const todosState = useSelector<AppState, TodoState>(state => state.todos);
-  const { todos, loadingStatus } = todosState;
+  const { todoRequests, loadingRequest } = todosState;
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(todoActions.loadTodos());
+    // dispatch(todoActions.loadTodos());
   }, [dispatch]);
 
   const addNewTodo = () => {
@@ -55,16 +53,17 @@ const App: React.FC = () => {
   };
 
   const deleteTodo = (item: TodoItem) => {
-    dispatch(todoActions.removeTodo({ item }));
+    dispatch(todoActions.removeTodo(item));
   };
 
   const deleteTodoCancel = (item: TodoItem) => {
-    dispatch(todoActions.removeTodoCancel({ item }));
+    // dispatch(todoActions.removeTodoCancel({ item }));
   };
 
-  const updateTodo = (itemState: TodoItemState, data: Partial<TodoData>) => {
-    const { request, ...item } = itemState;
-    dispatch(todoActions.updateTodo({ item, data }));
+  const updateTodo = (item: TodoItem) => {
+    console.log("updateTodo");
+    console.log(item);
+    dispatch(todoActions.updateTodo(item));
   };
 
   const onDescChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,15 +99,15 @@ const App: React.FC = () => {
         <Divider />
 
         <div>
-          {loadingStatus === ApiStatus.LOADING && <CircularProgress />}
+          {loadingRequest === RequestState.in_progress && <CircularProgress />}
 
-          {loadingStatus === ApiStatus.FAILED && (
+          {loadingRequest === RequestState.error && (
             <Typography color="error">Failed to load todos</Typography>
           )}
 
-          {loadingStatus === ApiStatus.LOADED && (
+          {loadingRequest === RequestState.success && (
             <TodoList
-              items={todos}
+              items={todoRequests}
               onItemUpdate={updateTodo}
               onItemDelete={deleteTodo}
               onItemDeleteCancel={deleteTodoCancel}
