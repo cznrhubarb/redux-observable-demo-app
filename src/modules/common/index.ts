@@ -24,7 +24,7 @@ export enum RequestType {
   delete = "delete"
 }
 
-export interface Request<P = void> {
+export interface Request<P = unknown> {
   type: RequestType | string;
   state: RequestState;
   payload: P;
@@ -70,3 +70,7 @@ export const feedbackSet = <State, Query, P>(
     )
   );
 };
+
+export const matchRequest = (type: RequestType, state: RequestState) => (
+  request: Request
+) => request.type === type && request.state === state;
