@@ -1,29 +1,14 @@
 {
   "todos": [
     {
-      "id": 0.05164582771454085,
+      "id": 0.7817316209816594,
       "completed": false,
-      "text": "Todo 5"
+      "text": "New todo 4"
     },
     {
-      "id": 0.6837337442228757,
-      "completed": true,
-      "text": "Todo 6"
-    },
-    {
-      "id": 0.9868709289335558,
-      "completed": true,
-      "text": "Todo 7"
-    },
-    {
-      "id": 0.037380803561458675,
+      "id": 0.35711102706157805,
       "completed": false,
-      "text": "New Todo"
-    },
-    {
-      "id": 0.1601320674153135,
-      "completed": false,
-      "text": "New todo 2"
+      "text": "New todo 5"
     }
   ]
 }

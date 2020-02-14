@@ -13,31 +13,26 @@ export const initialState: TodoState = {
   todoRequests: []
 };
 
-function createRequest<T>(
-  todo: T,
+const createRequest = <T>(
+  payload: T,
   type: RequestType = RequestType.create,
   state: RequestState = RequestState.inProgress
-) {
-  return {
-    type,
-    state,
-    payload: todo
-  };
-}
+) => ({
+  type,
+  state,
+  payload
+});
 
-function canUpdate<T>(request: Request<T>, type?: RequestType) {
-  return request.state === RequestState.inProgress
-    ? request.type === type
-    : true;
-}
+const canUpdate = <T>(request: Request<T>, type?: RequestType) =>
+  request.state === RequestState.inProgress ? request.type === type : true;
 
-function updateRequest<T>(
+const updateRequest = <T>(
   request: Request<T>,
   state?: RequestState,
   type?: RequestType,
   error?: Error
-) {
-  return canUpdate(request, type)
+) =>
+  canUpdate(request, type)
     ? ({
         ...request,
         state,
@@ -45,7 +40,6 @@ function updateRequest<T>(
         type
       } as Request<T>)
     : request;
-}
 
 // State is wrapped with immer produce so it can be mutated but the end result will be immutable
 const slice = createSlice({
@@ -120,11 +114,7 @@ const slice = createSlice({
     updateTodo(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
-          ? updateRequest(
-              { ...request, payload: action.payload },
-              RequestState.inProgress,
-              RequestType.update
-            )
+          ? updateRequest(request, RequestState.inProgress, RequestType.update)
           : request
       );
     },
