@@ -13,7 +13,7 @@ import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
 import RepeatRounded from "@material-ui/icons/RepeatRounded";
 
 import { Request, RequestState, RequestType } from "@modules/common";
-import { TodoItem } from "@modules/todos";
+import { TodoItem } from "../models";
 
 export interface Props {
   text: string;
@@ -21,7 +21,7 @@ export interface Props {
   divider?: boolean;
   onDeleteButtonClick?: () => void;
   onCheckBoxToggle?: () => void;
-  request?: Request<TodoItem>;
+  request: Request<TodoItem>;
 }
 
 const TodoListItem: React.FC<Props> = memo(props => {
@@ -38,7 +38,7 @@ const TodoListItem: React.FC<Props> = memo(props => {
     <ListItem divider={divider}>
       {request &&
       request.type === RequestType.update &&
-      request.state === RequestState.in_progress ? (
+      request.state === RequestState.inProgress ? (
         <CircularProgress size={42} color="secondary" />
       ) : (
         <Checkbox onClick={onCheckBoxToggle} checked={checked} />
@@ -68,7 +68,7 @@ const TodoListItem: React.FC<Props> = memo(props => {
       ) : null}
 
       {request?.type === RequestType.delete &&
-      request?.state === RequestState.in_progress ? (
+      request?.state === RequestState.inProgress ? (
         <ListItemSecondaryAction>
           <CircularProgress size={42} />
         </ListItemSecondaryAction>

@@ -14,8 +14,8 @@ import {
   TodoList,
   TodoState
 } from "@modules/todos";
-import { AppState } from "@store/index";
-import {RequestState} from "@modules/common";
+
+import { RequestState } from "@modules/common";
 
 const Wrap = styled.div`
   display: flex;
@@ -56,18 +56,20 @@ const App: React.FC = () => {
     dispatch(todoActions.removeTodo(item));
   };
 
-  const deleteTodoCancel = (item: TodoItem) => {
+  const deleteTodoCancel = (/* item: TodoItem */) => {
     // dispatch(todoActions.removeTodoCancel({ item }));
   };
 
   const updateTodo = (item: TodoItem) => {
-    console.log("updateTodo");
-    console.log(item);
     dispatch(todoActions.updateTodo(item));
   };
 
   const onDescChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDesc(e.target.value);
+  };
+
+  const onReset = () => {
+    dispatch(todoActions.reset());
   };
 
   return (
@@ -99,19 +101,31 @@ const App: React.FC = () => {
         <Divider />
 
         <div>
-          {loadingRequest === RequestState.in_progress && <CircularProgress />}
+          {loadingRequest === RequestState.inProgress && (
+            <Wrap>
+              <CircularProgress />
+            </Wrap>
+          )}
 
           {loadingRequest === RequestState.error && (
             <Typography color="error">Failed to load todos</Typography>
           )}
 
           {loadingRequest === RequestState.success && (
-            <TodoList
-              items={todoRequests}
-              onItemUpdate={updateTodo}
-              onItemDelete={deleteTodo}
-              onItemDeleteCancel={deleteTodoCancel}
-            />
+            <>
+              <TodoList
+                items={todoRequests}
+                onItemUpdate={updateTodo}
+                onItemDelete={deleteTodo}
+                onItemDeleteCancel={deleteTodoCancel}
+              />
+
+              <Wrap>
+                <Button onClick={onReset} color="primary">
+                  Reload
+                </Button>
+              </Wrap>
+            </>
           )}
         </div>
       </Content>

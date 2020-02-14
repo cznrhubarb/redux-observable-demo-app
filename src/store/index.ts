@@ -10,8 +10,12 @@ import {
   initialState as todosInitialState
 } from "@modules/todos";
 
-export interface AppState {
-  todos: TodoState;
+// App store declared globally so it can be referenced anywhere
+// without cycle imports
+declare global {
+  export interface AppState {
+    todos: TodoState;
+  }
 }
 
 export const initialState: AppState = {

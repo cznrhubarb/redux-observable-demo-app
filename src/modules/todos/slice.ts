@@ -9,37 +9,53 @@ export interface TodoState {
 }
 
 export const initialState: TodoState = {
-  loadingRequest: RequestState.in_progress,
+  loadingRequest: RequestState.inProgress,
   todoRequests: []
 };
 
-const createRequest = (
-  todo: TodoItem,
+function createRequest<T>(
+  todo: T,
   type: RequestType = RequestType.create,
-  state: RequestState = RequestState.in_progress
-) => ({
-  type,
-  state,
-  payload: todo
-});
-const updateRequest = (
-  request: Request<TodoItem>,
+  state: RequestState = RequestState.inProgress
+) {
+  return {
+    type,
+    state,
+    payload: todo
+  };
+}
+
+function canUpdate<T>(request: Request<T>, type?: RequestType) {
+  return request.state === RequestState.inProgress
+    ? request.type === type
+    : true;
+}
+
+function updateRequest<T>(
+  request: Request<T>,
   state?: RequestState,
   type?: RequestType,
   error?: Error
-) =>
-  ({
-    ...request,
-    state,
-    error,
-    type
-  } as Request<TodoItem>);
+) {
+  return canUpdate(request, type)
+    ? ({
+        ...request,
+        state,
+        error,
+        type
+      } as Request<T>)
+    : request;
+}
 
 // State is wrapped with immer produce so it can be mutated but the end result will be immutable
 const slice = createSlice({
   name: "todos",
   initialState,
   reducers: {
+    loadTodos(state: TodoState) {
+      state.loadingRequest = RequestState.inProgress;
+    },
+
     loadTodosDone(state: TodoState, action: PayloadAction<TodoItem[]>) {
       state.loadingRequest = RequestState.success;
       state.todoRequests = action.payload.map(todo =>
@@ -74,7 +90,7 @@ const slice = createSlice({
     removeTodo(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
-          ? updateRequest(request, RequestState.in_progress, RequestType.delete)
+          ? updateRequest(request, RequestState.inProgress, RequestType.delete)
           : request
       );
     },
@@ -106,7 +122,7 @@ const slice = createSlice({
         request.payload.id === action.payload.id
           ? updateRequest(
               { ...request, payload: action.payload },
-              RequestState.in_progress,
+              RequestState.inProgress,
               RequestType.update
             )
           : request
@@ -123,6 +139,10 @@ const slice = createSlice({
             )
           : request
       );
+    },
+
+    reset() {
+      return initialState;
     }
   }
 });

@@ -1,24 +1,29 @@
 {
   "todos": [
     {
-      "id": 0.7983959019215394,
-      "completed": true,
-      "text": "Todo 3"
-    },
-    {
-      "id": 0.2956951379331201,
-      "completed": true,
-      "text": "Todo 4"
-    },
-    {
-      "id": 0.13383591308345932,
+      "id": 0.05164582771454085,
       "completed": false,
-      "text": "Patuljak."
+      "text": "Todo 5"
     },
     {
-      "id": 0.8771291233508517,
+      "id": 0.6837337442228757,
       "completed": true,
-      "text": "Ja sam mali talibanac"
+      "text": "Todo 6"
+    },
+    {
+      "id": 0.9868709289335558,
+      "completed": true,
+      "text": "Todo 7"
+    },
+    {
+      "id": 0.037380803561458675,
+      "completed": false,
+      "text": "New Todo"
+    },
+    {
+      "id": 0.1601320674153135,
+      "completed": false,
+      "text": "New todo 2"
     }
   ]
 }
