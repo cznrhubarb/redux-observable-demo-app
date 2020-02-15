@@ -1,28 +1,18 @@
 {
   "todos": [
     {
-      "id": 0.10126313810679699,
-      "completed": false,
-      "text": "Todo 5"
+      "id": 0.3209126952650243,
+      "completed": true,
+      "text": "Todo 1."
     },
     {
-      "id": 0.7860756426534206,
-      "completed": false,
-      "text": "Todo 1"
+      "id": 0.30673463111541177,
+      "completed": true,
+      "text": "Todo 3."
     },
     {
-      "id": 0.3697240605066576,
-      "completed": false,
-      "text": "Todo 2"
-    },
-    {
-      "id": 0.35437855736150636,
-      "completed": false,
-      "text": "Todo 3"
-    },
-    {
-      "id": 0.5004493612864342,
-      "completed": false,
+      "id": 0.22126505210584257,
+      "completed": true,
       "text": "Todo 4"
     }
   ]

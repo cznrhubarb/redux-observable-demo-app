@@ -21,9 +21,9 @@ export const feedback = <State, Query>(
     switchMap(q => (q === undefined ? EMPTY : effect(q)))
   );
 
-export const feedbackSet = <State, Query, P>(
+export const feedbackSet = <State, Query>(
   query: (s: State) => Query[], // State => Set<Query>
-  effect: (q: Query) => Observable<PayloadAction<P>> // Query => Observable<Action>
+  effect: (q: Query) => Observable<PayloadAction<any>> // Query => Observable<Action>
 ) => (state$: Observable<State>) => {
   // Observable<State> => Observable<Action>
   const queries = state$.pipe(

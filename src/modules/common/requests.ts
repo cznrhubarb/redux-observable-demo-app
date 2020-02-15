@@ -12,7 +12,7 @@ export enum RequestType {
 }
 
 export interface Request<P = unknown> {
-  type: RequestType | string;
+  type: RequestType;
   state: RequestState;
   payload: P;
   error?: Error;
@@ -22,9 +22,10 @@ export const matchRequest = (
   type: RequestType,
   state: RequestState | RequestState[]
 ) => (request: Request) =>
-  request.type === type && Array.isArray(state)
+  request.type === type &&
+  (Array.isArray(state)
     ? state.includes(request.state)
-    : request.state === state;
+    : request.state === state);
 
 export const createRequest = <T>(
   payload: T,
