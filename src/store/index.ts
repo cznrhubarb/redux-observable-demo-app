@@ -4,18 +4,21 @@ import { combineEpics, createEpicMiddleware } from "redux-observable";
 import { createLogger } from "redux-logger";
 
 import {
-  TodoState,
   epics as todosEpics,
   reducer as todosReducer,
   initialState as todosInitialState,
 } from "@modules/todos";
 
+const reducer = combineReducers({
+  todos: todosReducer,
+});
+
+type CombinedState = ReturnType<typeof reducer>;
+
 // App store declared globally so it can be referenced anywhere
 // without cycle imports
 declare global {
-  export interface AppState {
-    todos: TodoState;
-  }
+  export type AppState = CombinedState;
 }
 
 export const initialState: AppState = {
@@ -23,10 +26,6 @@ export const initialState: AppState = {
 };
 
 export function createStore() {
-  const reducer = combineReducers({
-    todos: todosReducer,
-  });
-
   const logger = createLogger();
   const epicMiddleware = createEpicMiddleware();
   const rootEpic = combineEpics(todosEpics);
