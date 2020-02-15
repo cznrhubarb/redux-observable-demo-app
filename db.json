@@ -1,11 +1,6 @@
 {
   "todos": [
     {
-      "id": 0.3209126952650243,
-      "completed": true,
-      "text": "Todo 1."
-    },
-    {
       "id": 0.30673463111541177,
       "completed": true,
       "text": "Todo 3."
@@ -14,6 +9,16 @@
       "id": 0.22126505210584257,
       "completed": true,
       "text": "Todo 4"
+    },
+    {
+      "id": 0.2570410448971492,
+      "completed": false,
+      "text": "Todo 7"
+    },
+    {
+      "id": 0.3671930055073782,
+      "completed": false,
+      "text": "Todo 8"
     }
   ]
 }

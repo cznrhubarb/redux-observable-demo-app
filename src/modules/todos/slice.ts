@@ -108,11 +108,7 @@ const slice = createSlice({
     updateTodo(state: TodoState, action: PayloadAction<TodoItem>) {
       state.todoRequests = state.todoRequests.map(request =>
         request.payload.id === action.payload.id
-          ? updateRequest(
-              { ...request, payload: action.payload },
-              RequestState.inProgress,
-              RequestType.update
-            )
+          ? updateRequest(request, RequestState.inProgress, RequestType.update)
           : request
       );
     },

@@ -10,15 +10,15 @@ import {
   Request,
   matchRequest,
 } from "@modules/common/requests";
-import { feedback, feedbackSet } from "@modules/common/operators";
+import { feedbackFlag, feedbackArray } from "@modules/common/operators";
 
 import { actions, TodoState } from "./slice";
 
 const loadTodosEpic: Epic = (_, state$: StateObservable<AppState>) =>
   state$.pipe(
     map(state => state.todos),
-    feedback(
-      s => matchRequest(RT.read, RS.inProgress)(s.loadingRequest) || undefined,
+    feedbackFlag(
+      s => matchRequest(RT.read, RS.inProgress)(s.loadingRequest),
       () =>
         ajaxGet("http://localhost:5000/todos").pipe(
           retry(3),
@@ -31,7 +31,7 @@ const loadTodosEpic: Epic = (_, state$: StateObservable<AppState>) =>
 const updateTodoEpic: Epic = (_, state$: StateObservable<AppState>) =>
   state$.pipe(
     map(s => s.todos),
-    feedbackSet<TodoState, Request<TodoItem>>(
+    feedbackArray<TodoState, Request<TodoItem>>(
       s => s.todoRequests.filter(matchRequest(RT.update, RS.inProgress)),
       request =>
         ajax({
@@ -59,7 +59,7 @@ const updateTodoEpic: Epic = (_, state$: StateObservable<AppState>) =>
 const addTodoEpic: Epic = (_, state$: Observable<AppState>) =>
   state$.pipe(
     map(s => s.todos),
-    feedbackSet<TodoState, Request<TodoItem>>(
+    feedbackArray<TodoState, Request<TodoItem>>(
       s => s.todoRequests.filter(matchRequest(RT.create, RS.inProgress)),
       request =>
         ajax({
@@ -79,7 +79,7 @@ const addTodoEpic: Epic = (_, state$: Observable<AppState>) =>
 const removeTodoEpic: Epic = (_, state$: Observable<AppState>) =>
   state$.pipe(
     map(s => s.todos),
-    feedbackSet<TodoState, Request<TodoItem>>(
+    feedbackArray<TodoState, Request<TodoItem>>(
       s => s.todoRequests.filter(matchRequest(RT.delete, RS.inProgress)),
       request =>
         ajax({
