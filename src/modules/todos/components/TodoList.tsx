@@ -8,7 +8,6 @@ import { TodoItem } from "../models";
 export interface Props {
   items: Request<TodoItem>[];
   onItemDelete: (item: TodoItem) => void;
-  onItemDeleteCancel: (item: TodoItem) => void;
   onItemUpdate: (item: TodoItem) => void;
 }
 
