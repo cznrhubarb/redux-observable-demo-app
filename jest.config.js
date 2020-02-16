@@ -1,6 +1,3 @@
-// const { pathsToModuleNameMapper } = require("ts-jest/utils");
-// const { compilerOptions } = require("./tsconfig.json");
-
 module.exports = {
   "roots": [
     "<rootDir>/src"
@@ -9,6 +6,7 @@ module.exports = {
     "^.+\\.tsx?$": "ts-jest"
   },
   "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+  "testEnvironment": "jsdom",
   "moduleFileExtensions": [
     "ts",
     "tsx",
@@ -18,5 +16,13 @@ module.exports = {
     "node"
   ],
   "snapshotSerializers": ["enzyme-to-json/serializer"],
-  // "moduleNameMapper": pathsToModuleNameMapper(compilerOptions.paths /*, { prefix: "<rootDir>/" } */ ),
+  "moduleNameMapper": {
+    "^@modules/(.*)": "<rootDir>/src/modules/$1",
+    "^@store/(.*)": "<rootDir>/src/store/$1",
+  },
+  "setupFilesAfterEnv": ["<rootDir>/src/setupTests.ts"],
+  "watchPlugins": [
+    "jest-watch-typeahead/filename",
+    "jest-watch-typeahead/testname"
+  ],
 }

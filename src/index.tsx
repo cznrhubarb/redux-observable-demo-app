@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 
-import { createStore } from "./store";
+import { createStore } from "@store/index";
 import App from "./App";
 
 // Look into store.scubsrcibe
