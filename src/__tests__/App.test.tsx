@@ -10,7 +10,7 @@ import App from "../App";
 describe("App", () => {
   const store = createStore();
 
-  it("it mounts without crashing", () => {
+  it("mounts without crashing", () => {
     mount(
       <Provider store={store}>
         <App />
