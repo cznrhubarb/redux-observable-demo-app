@@ -11,14 +11,14 @@
       "text": "Todo 4"
     },
     {
-      "id": 0.2570410448971492,
-      "completed": false,
-      "text": "Todo 7"
-    },
-    {
       "id": 0.3671930055073782,
       "completed": false,
       "text": "Todo 8"
+    },
+    {
+      "id": 0.8574067978767577,
+      "completed": false,
+      "text": "Do not kill Vinko"
     }
   ]
 }
