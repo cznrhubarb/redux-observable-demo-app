@@ -27,7 +27,9 @@
     "eject": "react-scripts eject",
     "server": "json-server --watch db.json --port 5000 --delay 5000",
     "format": "prettier --config ./.prettierrc.js --check 'src/**/*' 'assets/**/*.json' --write",
-    "lint": "eslint ./src/**/*.{ts,tsx} --fix"
+    "lint": "eslint ./src/**/*.{ts,tsx} --fix",
+    "storybook": "start-storybook -p 9009 -s public",
+    "build-storybook": "build-storybook -s public"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -45,6 +47,11 @@
     ]
   },
   "devDependencies": {
+    "@storybook/addon-actions": "^5.3.13",
+    "@storybook/addon-links": "^5.3.13",
+    "@storybook/addons": "^5.3.13",
+    "@storybook/preset-create-react-app": "^1.5.2",
+    "@storybook/react": "^5.3.13",
     "@types/enzyme": "^3.10.5",
     "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/jest": "^24.9.1",
