@@ -23,5 +23,8 @@
   "include": [
     "src"
   ],
+  "exclude": [
+    "src/**/*.snap.ts*"
+  ],
   "extends": "./tsconfig.paths.json"
 }
