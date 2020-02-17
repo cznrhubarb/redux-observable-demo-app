@@ -72,6 +72,10 @@ const App: React.FC = () => {
     dispatch(todoActions.reset());
   };
 
+  const onCancel = () => {
+    dispatch(todoActions.loadTodosCancel());
+  };
+
   return (
     <Wrap>
       <Content>
@@ -122,9 +126,15 @@ const App: React.FC = () => {
           )}
 
           <Wrap>
-            <Button onClick={onReset} color="primary">
-              Reload
-            </Button>
+            {matchRequest(RT.read, RS.inProgress)(loadingRequest) ? (
+              <Button onClick={onCancel} color="secondary">
+                Cancel
+              </Button>
+            ) : (
+              <Button onClick={onReset} color="primary">
+                Reload
+              </Button>
+            )}
           </Wrap>
         </div>
       </Content>

@@ -47,6 +47,14 @@ const slice = createSlice({
       );
     },
 
+    loadTodosCancel(state: TodoState) {
+      state.loadingRequest = updateRequest(
+        state.loadingRequest,
+        RequestState.success,
+        RequestType.read
+      );
+    },
+
     loadTodosError(state: TodoState) {
       state.loadingRequest = updateRequest(
         state.loadingRequest,
