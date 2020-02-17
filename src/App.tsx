@@ -60,10 +60,6 @@ const App: React.FC = () => {
     dispatch(todoActions.removeTodo(item));
   };
 
-  const deleteTodoCancel = (/* item: TodoItem */) => {
-    // dispatch(todoActions.removeTodoCancel({ item }));
-  };
-
   const updateTodo = (item: TodoItem) => {
     dispatch(todoActions.updateTodo(item));
   };
@@ -121,7 +117,6 @@ const App: React.FC = () => {
                 items={todoRequests}
                 onItemUpdate={updateTodo}
                 onItemDelete={deleteTodo}
-                onItemDeleteCancel={deleteTodoCancel}
               />
             </>
           )}
