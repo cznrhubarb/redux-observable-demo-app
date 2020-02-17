@@ -1,13 +1,13 @@
 module.exports = {
-  "roots": [
+  roots: [
     "<rootDir>/src"
   ],
-  "transform": {
+  transform: {
     "^.+\\.tsx?$": "ts-jest"
   },
-  "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
-  "testEnvironment": "jsdom",
-  "moduleFileExtensions": [
+  // testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+  testEnvironment: "jsdom",
+  moduleFileExtensions: [
     "ts",
     "tsx",
     "js",
@@ -15,14 +15,16 @@ module.exports = {
     "json",
     "node"
   ],
-  "snapshotSerializers": ["enzyme-to-json/serializer"],
-  "moduleNameMapper": {
+  snapshotSerializers: ["enzyme-to-json/serializer"],
+  moduleNameMapper: {
     "^@modules/(.*)": "<rootDir>/src/modules/$1",
     "^@store/(.*)": "<rootDir>/src/store/$1",
   },
-  "setupFilesAfterEnv": ["<rootDir>/src/setupTests.ts"],
-  "watchPlugins": [
+  setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
+  watchPlugins: [
     "jest-watch-typeahead/filename",
     "jest-watch-typeahead/testname"
   ],
+
+  snapshotResolver: "<rootDir>/jest.snapshotResolver.js"
 }

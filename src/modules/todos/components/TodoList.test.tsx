@@ -3,9 +3,9 @@ import React from "react";
 
 import { Request, createRequest } from "@modules/common/requests";
 
-import TodoList from "../../components/TodoList";
-import TodoItemComponent from "../../components/TodoItem";
-import { TodoItem } from "../../models";
+import TodoList from "./TodoList";
+import TodoItemComponent from "./TodoItem";
+import { TodoItem } from "../models";
 
 describe("TodoList", () => {
   const onItemDelete = jest.fn();
