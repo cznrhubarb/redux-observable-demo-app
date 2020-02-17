@@ -1,79 +1,27 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { ApiStatus } from "@modules/common";
-import { TodoItem, TodoData, Item } from "./models";
-
-export enum RequestState {
-  initial = "initial", // Not processed yet
-  in_progress = "in_progress", // Request is processing
-  success = "success", // Request finished and succeeds
-  error = "error", // Request finished and failed
-  canceled = "canceled" //  Request canceled by user
-}
-
-export enum RequestType {
-  create = "create",
-  read = "read",
-  update = "update",
-  delete = "delete"
-}
-
-export interface Request<P = void> {
-  type: RequestType | string;
-  state: RequestState;
-  payload?: P;
-  error?: Error;
-}
-
-interface ItemWithRequest<P = void> extends Item {
-  request?: Request<P>;
-}
-
-export interface TodoItemState extends TodoItem, ItemWithRequest {}
+import {
+  RequestState,
+  RequestType,
+  Request,
+  createRequest,
+  updateRequest,
+} from "@modules/common/requests";
+import { TodoItem, TodoData, createTodo } from "./models";
 
 export interface TodoState {
-  loadingStatus: ApiStatus;
-  addingStatus: ApiStatus;
-  todoToAdd?: TodoData;
-  todos: TodoItemState[];
+  loadingRequest: Request;
+  todoRequests: Request<TodoItem>[];
 }
 
 export const initialState: TodoState = {
-  loadingStatus: ApiStatus.LOADING,
-  addingStatus: ApiStatus.LOADED,
-  todos: []
+  loadingRequest: createRequest(
+    undefined,
+    RequestType.read,
+    RequestState.inProgress
+  ),
+  todoRequests: [],
 };
-
-function setRequest<T extends ItemWithRequest>(item: T, request: Request): T {
-  const activeRequest = item.request;
-  const activeRequestInProgress =
-    activeRequest &&
-    [RequestState.initial, RequestState.in_progress].includes(
-      activeRequest.state
-    );
-  const sameRequestType = activeRequest?.type === request.type;
-
-  if (!activeRequestInProgress || sameRequestType) {
-    return { ...item, request };
-  }
-
-  return item;
-}
-
-function setRequestOnListItem<T extends ItemWithRequest>(
-  list: T[],
-  itemId: T["id"],
-  request: Request
-): T[] {
-  const itemIndex = list.findIndex(i => i.id === itemId);
-  if (itemIndex !== -1) {
-    return Object.assign([], list, {
-      [itemIndex]: setRequest(list[itemIndex], request)
-    });
-  }
-
-  return list;
-}
 
 // State is wrapped with immer produce so it can be mutated but the end result will be immutable
 const slice = createSlice({
@@ -81,144 +29,122 @@ const slice = createSlice({
   initialState,
   reducers: {
     loadTodos(state: TodoState) {
-      state.loadingStatus = ApiStatus.LOADING;
+      state.loadingRequest = updateRequest(
+        state.loadingRequest,
+        RequestState.inProgress,
+        RequestType.read
+      );
     },
 
     loadTodosDone(state: TodoState, action: PayloadAction<TodoItem[]>) {
-      state.loadingStatus = ApiStatus.LOADED;
-      state.todos = action.payload;
+      state.loadingRequest = updateRequest(
+        state.loadingRequest,
+        RequestState.success,
+        RequestType.read
+      );
+      state.todoRequests = action.payload.map(todo =>
+        createRequest(todo, RequestType.read, RequestState.success)
+      );
     },
 
     loadTodosError(state: TodoState) {
-      state.loadingStatus = ApiStatus.FAILED;
+      state.loadingRequest = updateRequest(
+        state.loadingRequest,
+        RequestState.error,
+        RequestType.read
+      );
     },
 
     addTodo(state: TodoState, action: PayloadAction<TodoData>) {
-      state.addingStatus = ApiStatus.LOADING;
-      state.todoToAdd = action.payload;
+      state.todoRequests.push(createRequest(createTodo(action.payload)));
     },
 
     addTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
-      state.addingStatus = ApiStatus.LOADED;
-      state.todos.push(action.payload);
-      delete state.todoToAdd;
+      state.todoRequests = state.todoRequests.map(request =>
+        request.payload.id === action.payload.id
+          ? updateRequest(request, RequestState.success, RequestType.create)
+          : request
+      );
     },
 
-    addTodoError(state: TodoState) {
-      state.loadingStatus = ApiStatus.FAILED;
+    addTodoError(state: TodoState, action: PayloadAction<TodoItem>) {
+      state.todoRequests = state.todoRequests.map(request =>
+        request.payload.id === action.payload.id
+          ? updateRequest(request, RequestState.error, RequestType.create)
+          : request
+      );
     },
 
-    removeTodo(state: TodoState, action: PayloadAction<{ item: TodoItem }>) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.delete,
-        state: RequestState.initial
-      });
+    removeTodo(state: TodoState, action: PayloadAction<TodoItem>) {
+      state.todoRequests = state.todoRequests.map(request =>
+        request.payload.id === action.payload.id
+          ? updateRequest(request, RequestState.inProgress, RequestType.delete)
+          : request
+      );
     },
 
-    removeTodoInProgress(
-      state: TodoState,
-      action: PayloadAction<{ item: TodoItem }>
-    ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.delete,
-        state: RequestState.in_progress
-      });
-    },
-
-    removeTodoCancel(
-      state: TodoState,
-      action: PayloadAction<{ item: TodoItem }>
-    ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.delete,
-        state: RequestState.canceled
-      });
-    },
-
-    removeTodoDone(
-      state: TodoState,
-      action: PayloadAction<{ item: TodoItem }>
-    ) {
-      state.todos = state.todos.filter(t => t.id !== action.payload.item.id);
+    removeTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
+      state.todoRequests = state.todoRequests.filter(
+        request => request.payload.id !== action.payload.id
+      );
     },
 
     removeTodoError(
       state: TodoState,
       action: PayloadAction<{ item: TodoItem; error: Error }>
     ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.delete,
-        state: RequestState.error,
-        error: action.payload.error
-      });
-    },
-
-    updateTodo(
-      state: TodoState,
-      action: PayloadAction<{ item: TodoItem; data: Partial<TodoData> }>
-    ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.update,
-        state: RequestState.initial
-      });
-    },
-
-    updateTodoInProgress(
-      state: TodoState,
-      action: PayloadAction<{ item: TodoItem; data: Partial<TodoData> }>
-    ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.update,
-        state: RequestState.in_progress
-      });
-    },
-
-    updateTodoCancel(
-      state: TodoState,
-      action: PayloadAction<{ item: TodoItem; data: Partial<TodoData> }>
-    ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.update,
-        state: RequestState.canceled
-      });
-    },
-
-    updateTodoDone(
-      state: TodoState,
-      action: PayloadAction<{ item: TodoItem; data: Partial<TodoData> }>
-    ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.update,
-        state: RequestState.success
-      });
-
-      const itemIndex = state.todos.findIndex(
-        i => i.id === action.payload.item.id
+      state.todoRequests = state.todoRequests.map(request =>
+        request.payload.id === action.payload.item.id
+          ? updateRequest(
+              request,
+              RequestState.error,
+              RequestType.delete,
+              action.payload.error.message
+            )
+          : request
       );
+    },
 
-      if (itemIndex !== -1) {
-        state.todos[itemIndex] = {
-          ...state.todos[itemIndex],
-          ...action.payload.data
-        };
-      }
+    updateTodo(state: TodoState, action: PayloadAction<TodoItem>) {
+      state.todoRequests = state.todoRequests.map(request =>
+        request.payload.id === action.payload.id
+          ? updateRequest(request, RequestState.inProgress, RequestType.update)
+          : request
+      );
+    },
+
+    updateTodoDone(state: TodoState, action: PayloadAction<TodoItem>) {
+      state.todoRequests = state.todoRequests.map(request =>
+        request.payload.id === action.payload.id
+          ? updateRequest(
+              { ...request, payload: action.payload },
+              RequestState.success,
+              RequestType.update
+            )
+          : request
+      );
     },
 
     updateTodoError(
       state: TodoState,
-      action: PayloadAction<{
-        item: TodoItem;
-        data: Partial<TodoData>;
-        error: Error;
-      }>
+      action: PayloadAction<{ item: TodoItem; error: Error }>
     ) {
-      state.todos = setRequestOnListItem(state.todos, action.payload.item.id, {
-        type: RequestType.update,
-        state: RequestState.error,
-        error: action.payload.error
-      });
-    }
-  }
+      state.todoRequests = state.todoRequests.map(request =>
+        request.payload.id === action.payload.item.id
+          ? updateRequest(
+              request,
+              RequestState.error,
+              RequestType.update,
+              action.payload.error.message
+            )
+          : request
+      );
+    },
+
+    reset() {
+      return initialState;
+    },
+  },
 });
 
 export const { reducer, actions } = slice;

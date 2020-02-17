@@ -1,9 +1,19 @@
+import { mount } from "enzyme";
 import React from "react";
-import { render } from "@testing-library/react";
+import { Provider } from "react-redux";
+
+import { createStore } from "@store/index";
+
 import App from "./App";
 
-test("renders learn react link", () => {
-  const { getByText } = render(<App />);
-  const linkElement = getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+describe("App", () => {
+  const store = createStore();
+
+  it("mounts without crashing", () => {
+    mount(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
+  });
 });

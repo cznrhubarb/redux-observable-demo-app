@@ -13,6 +13,6 @@ export function createTodo(data: TodoData): TodoItem {
   return {
     id: Math.random(),
     completed: data.completed ?? false,
-    text: data.text
+    text: data.text,
   };
 }

@@ -17,10 +17,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react"
+    "jsx": "react",
+    "downlevelIteration": true
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "src/**/*.snap.ts*"
   ],
   "extends": "./tsconfig.paths.json"
 }

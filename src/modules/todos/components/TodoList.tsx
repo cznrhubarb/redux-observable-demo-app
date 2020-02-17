@@ -1,15 +1,14 @@
 import React, { memo } from "react";
 import { List, Paper } from "@material-ui/core";
 
+import { Request } from "@modules/common/requests";
 import TodoListItem from "./TodoItem";
-import { TodoItemState } from "../slice";
-import { TodoData } from "../models";
+import { TodoItem } from "../models";
 
 export interface Props {
-  items: TodoItemState[];
-  onItemDelete: (item: TodoItemState) => void;
-  onItemDeleteCancel: (item: TodoItemState) => void;
-  onItemUpdate: (item: TodoItemState, data: Partial<TodoData>) => void;
+  items: Request<TodoItem>[];
+  onItemDelete: (item: TodoItem) => void;
+  onItemUpdate: (item: TodoItem) => void;
 }
 
 const TodoList: React.FC<Props> = memo(props => (
@@ -19,15 +18,17 @@ const TodoList: React.FC<Props> = memo(props => (
         <List style={{ overflow: "scroll" }}>
           {props.items.map((todo, idx) => (
             <TodoListItem
-              key={`TodoItem.${todo.id}`}
-              text={todo.text}
-              request={todo.request}
-              checked={Boolean(todo.completed)}
+              key={`TodoItem.${todo.payload.id}`}
+              text={todo.payload.text}
+              request={todo}
+              checked={Boolean(todo.payload.completed)}
               divider={idx !== props.items.length - 1}
-              onDeleteButtonClick={() => props.onItemDelete(todo)}
-              onCancelButtonClick={() => props.onItemDeleteCancel(todo)}
+              onDeleteButtonClick={() => props.onItemDelete(todo.payload)}
               onCheckBoxToggle={() =>
-                props.onItemUpdate(todo, { completed: !todo.completed })
+                props.onItemUpdate({
+                  ...todo.payload,
+                  completed: !todo.payload.completed,
+                })
               }
             />
           ))}
