@@ -1,21 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import { action } from "@storybook/addon-actions";
+import { withKnobs, select } from "@storybook/addon-knobs";
 
 import { TodoItem as TodoModel } from "@modules/todos/models";
 import { Request, RequestType, RequestState } from "@modules/common/requests";
 
-import {
-  List,
-  Select,
-  FormControl,
-  InputLabel,
-  MenuItem,
-} from "@material-ui/core";
+import { List } from "@material-ui/core";
+
 import TodoItem from "./TodoItem";
 
 export default {
   title: "TodoItem",
   component: TodoItem,
+  decorators: [withKnobs],
 };
 
 const request: Request<TodoModel> = {
@@ -45,55 +42,38 @@ export const withEmoji = () => (
 );
 
 export const withRequest = () => {
-  const [state, setState] = useState(RequestState.inProgress);
-  const [type, setType] = useState(RequestType.create);
+  const typeSelectKnob = select(
+    "Request Type",
+    {
+      Create: RequestType.create,
+      Delete: RequestType.delete,
+      Read: RequestType.read,
+      Update: RequestType.update,
+    },
+    RequestType.create
+  );
 
-  const testRequest = {
-    ...request,
-    state,
-    type,
-  };
+  const stateSelectKnob = select(
+    "Request State",
+    {
+      InProgress: RequestState.inProgress,
+      Success: RequestState.success,
+      Error: RequestState.error,
+    },
+    RequestState.inProgress
+  );
 
   return (
-    <>
-      <div style={{ margin: 32 }}>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Request type</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={type}
-            onChange={e => setType(e.target.value as RequestType)}
-          >
-            <MenuItem value={RequestType.create}>Create</MenuItem>
-            <MenuItem value={RequestType.delete}>Delete</MenuItem>
-            <MenuItem value={RequestType.read}>Read</MenuItem>
-            <MenuItem value={RequestType.update}>Update</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
-      <div style={{ margin: 32 }}>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Request status</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={state}
-            onChange={e => setState(e.target.value as RequestState)}
-          >
-            <MenuItem value={RequestState.inProgress}>In Progress</MenuItem>
-            <MenuItem value={RequestState.success}>Success</MenuItem>
-            <MenuItem value={RequestState.error}>Error</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
-      <List>
-        <TodoItem
-          onCheckBoxToggle={action("checked")}
-          text="Hello World Todo Item"
-          request={testRequest}
-        />
-      </List>
-    </>
+    <List>
+      <TodoItem
+        onCheckBoxToggle={action("checked")}
+        text="Hello World Todo Item"
+        request={{
+          ...request,
+          type: typeSelectKnob,
+          state: stateSelectKnob,
+        }}
+      />
+    </List>
   );
 };
