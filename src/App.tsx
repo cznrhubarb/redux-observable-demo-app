@@ -12,10 +12,14 @@ import {
   actions as todoActions,
   TodoItem,
   TodoList,
-  TodoState
+  TodoState,
 } from "@modules/todos";
-import { AppState } from "@store/index";
-import {RequestState} from "@modules/common";
+
+import {
+  RequestState as RS,
+  RequestType as RT,
+  matchRequest,
+} from "@modules/common/requests";
 
 const Wrap = styled.div`
   display: flex;
@@ -56,18 +60,16 @@ const App: React.FC = () => {
     dispatch(todoActions.removeTodo(item));
   };
 
-  const deleteTodoCancel = (item: TodoItem) => {
-    // dispatch(todoActions.removeTodoCancel({ item }));
-  };
-
   const updateTodo = (item: TodoItem) => {
-    console.log("updateTodo");
-    console.log(item);
     dispatch(todoActions.updateTodo(item));
   };
 
   const onDescChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDesc(e.target.value);
+  };
+
+  const onReset = () => {
+    dispatch(todoActions.reset());
   };
 
   return (
@@ -99,20 +101,31 @@ const App: React.FC = () => {
         <Divider />
 
         <div>
-          {loadingRequest === RequestState.in_progress && <CircularProgress />}
+          {matchRequest(RT.read, RS.inProgress)(loadingRequest) && (
+            <Wrap>
+              <CircularProgress />
+            </Wrap>
+          )}
 
-          {loadingRequest === RequestState.error && (
+          {matchRequest(RT.read, RS.error)(loadingRequest) && (
             <Typography color="error">Failed to load todos</Typography>
           )}
 
-          {loadingRequest === RequestState.success && (
-            <TodoList
-              items={todoRequests}
-              onItemUpdate={updateTodo}
-              onItemDelete={deleteTodo}
-              onItemDeleteCancel={deleteTodoCancel}
-            />
+          {matchRequest(RT.read, RS.success)(loadingRequest) && (
+            <>
+              <TodoList
+                items={todoRequests}
+                onItemUpdate={updateTodo}
+                onItemDelete={deleteTodo}
+              />
+            </>
           )}
+
+          <Wrap>
+            <Button onClick={onReset} color="primary">
+              Reload
+            </Button>
+          </Wrap>
         </div>
       </Content>
     </Wrap>

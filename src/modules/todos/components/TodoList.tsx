@@ -1,14 +1,13 @@
 import React, { memo } from "react";
 import { List, Paper } from "@material-ui/core";
 
-import { Request } from "@modules/common";
+import { Request } from "@modules/common/requests";
 import TodoListItem from "./TodoItem";
 import { TodoItem } from "../models";
 
 export interface Props {
   items: Request<TodoItem>[];
   onItemDelete: (item: TodoItem) => void;
-  onItemDeleteCancel: (item: TodoItem) => void;
   onItemUpdate: (item: TodoItem) => void;
 }
 
@@ -28,7 +27,7 @@ const TodoList: React.FC<Props> = memo(props => (
               onCheckBoxToggle={() =>
                 props.onItemUpdate({
                   ...todo.payload,
-                  completed: !todo.payload.completed
+                  completed: !todo.payload.completed,
                 })
               }
             />
