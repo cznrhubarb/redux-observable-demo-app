@@ -1,6 +1,5 @@
-import { combineEpics, Epic, StateObservable } from "redux-observable";
 import { catchError, map, retry } from "rxjs/operators";
-import { Observable, of } from "rxjs";
+import { of } from "rxjs";
 import { ajax, ajaxGet } from "rxjs/internal-compatibility";
 
 import { TodoItem } from "@modules/todos/models";
@@ -11,10 +10,11 @@ import {
   matchRequest,
 } from "@modules/common/requests";
 import { feedbackFlag, feedbackArray } from "@modules/common/operators";
+import { StateEpic, combineStateEpics } from "@modules/common/epics";
 
 import { actions, TodoState } from "./slice";
 
-const loadTodosEpic: Epic = (_, state$: StateObservable<AppState>) =>
+const loadTodosEpic: StateEpic<AppState> = state$ =>
   state$.pipe(
     map(state => state.todos),
     feedbackFlag(
@@ -28,7 +28,7 @@ const loadTodosEpic: Epic = (_, state$: StateObservable<AppState>) =>
     )
   );
 
-const updateTodoEpic: Epic = (_, state$: StateObservable<AppState>) =>
+const updateTodoEpic: StateEpic<AppState> = state$ =>
   state$.pipe(
     map(s => s.todos),
     feedbackArray<TodoState, Request<TodoItem>>(
@@ -56,7 +56,7 @@ const updateTodoEpic: Epic = (_, state$: StateObservable<AppState>) =>
     )
   );
 
-const addTodoEpic: Epic = (_, state$: Observable<AppState>) =>
+const addTodoEpic: StateEpic<AppState> = state$ =>
   state$.pipe(
     map(s => s.todos),
     feedbackArray<TodoState, Request<TodoItem>>(
@@ -76,7 +76,7 @@ const addTodoEpic: Epic = (_, state$: Observable<AppState>) =>
     )
   );
 
-const removeTodoEpic: Epic = (_, state$: Observable<AppState>) =>
+const removeTodoEpic: StateEpic<AppState> = state$ =>
   state$.pipe(
     map(s => s.todos),
     feedbackArray<TodoState, Request<TodoItem>>(
@@ -99,7 +99,7 @@ const removeTodoEpic: Epic = (_, state$: Observable<AppState>) =>
     )
   );
 
-export default combineEpics(
+export default combineStateEpics(
   loadTodosEpic,
   updateTodoEpic,
   addTodoEpic,
