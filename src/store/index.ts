@@ -31,7 +31,7 @@ export function createStore() {
   const epicMiddleware = createEpicMiddleware<
     Action<unknown>,
     Action<unknown>,
-    CombinedState
+    AppState
   >();
   const rootEpic = combineEpics(todosEpics);
 
