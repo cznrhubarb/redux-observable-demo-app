@@ -17,61 +17,76 @@ exports[`TodoList matches snapshot 1`] = `
       }
     >
       <Memo()
-        checked={false}
         divider={true}
-        key="TodoItem.1"
-        onCheckBoxToggle={[Function]}
-        onDeleteButtonClick={[Function]}
-        request={
+        item={
           Object {
-            "payload": Object {
+            "data": Object {
               "completed": false,
               "id": 1,
               "text": "Todo 1",
             },
-            "state": "inProgress",
-            "type": "create",
+            "request": Object {
+              "payload": Object {
+                "completed": false,
+                "id": 1,
+                "text": "Todo 1",
+              },
+              "state": "success",
+              "type": "create",
+            },
           }
         }
-        text="Todo 1"
-      />
-      <Memo()
-        checked={false}
-        divider={true}
-        key="TodoItem.2"
+        key="TodoItem.1"
         onCheckBoxToggle={[Function]}
         onDeleteButtonClick={[Function]}
-        request={
+      />
+      <Memo()
+        divider={true}
+        item={
           Object {
-            "payload": Object {
+            "data": Object {
               "completed": false,
               "id": 2,
               "text": "Todo 2",
             },
-            "state": "inProgress",
-            "type": "create",
+            "request": Object {
+              "payload": Object {
+                "completed": false,
+                "id": 2,
+                "text": "Todo 2",
+              },
+              "state": "success",
+              "type": "create",
+            },
           }
         }
-        text="Todo 2"
-      />
-      <Memo()
-        checked={false}
-        divider={false}
-        key="TodoItem.3"
+        key="TodoItem.2"
         onCheckBoxToggle={[Function]}
         onDeleteButtonClick={[Function]}
-        request={
+      />
+      <Memo()
+        divider={false}
+        item={
           Object {
-            "payload": Object {
+            "data": Object {
               "completed": false,
               "id": 3,
               "text": "Todo 3",
             },
-            "state": "inProgress",
-            "type": "create",
+            "request": Object {
+              "payload": Object {
+                "completed": false,
+                "id": 3,
+                "text": "Todo 3",
+              },
+              "state": "success",
+              "type": "create",
+            },
           }
         }
-        text="Todo 3"
+        key="TodoItem.3"
+        onCheckBoxToggle={[Function]}
+        onDeleteButtonClick={[Function]}
       />
     </WithStyles(ForwardRef(List))>
   </WithStyles(ForwardRef(Paper))>

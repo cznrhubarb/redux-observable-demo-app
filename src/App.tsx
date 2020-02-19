@@ -43,7 +43,7 @@ const App: React.FC = () => {
   const [desc, setDesc] = useState("");
   const textRef = useRef<HTMLInputElement>();
   const todosState = useSelector<AppState, TodoState>(state => state.todos);
-  const { todoRequests, loadingRequest } = todosState;
+  const { entities, loading } = todosState;
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -105,20 +105,20 @@ const App: React.FC = () => {
         <Divider />
 
         <div>
-          {matchRequest(RT.read, RS.inProgress)(loadingRequest) && (
+          {matchRequest(RT.read, RS.inProgress)(loading) && (
             <Wrap>
               <CircularProgress />
             </Wrap>
           )}
 
-          {matchRequest(RT.read, RS.error)(loadingRequest) && (
+          {matchRequest(RT.read, RS.error)(loading) && (
             <Typography color="error">Failed to load todos</Typography>
           )}
 
-          {matchRequest(RT.read, RS.success)(loadingRequest) && (
+          {matchRequest(RT.read, RS.success)(loading) && (
             <>
               <TodoList
-                items={todoRequests}
+                items={entities}
                 onItemUpdate={updateTodo}
                 onItemDelete={deleteTodo}
               />
@@ -126,7 +126,7 @@ const App: React.FC = () => {
           )}
 
           <Wrap>
-            {matchRequest(RT.read, RS.inProgress)(loadingRequest) ? (
+            {matchRequest(RT.read, RS.inProgress)(loading) ? (
               <Button onClick={onCancel} color="secondary">
                 Cancel
               </Button>

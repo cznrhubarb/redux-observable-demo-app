@@ -32,15 +32,28 @@ export const withText = () => (
   <List>
     <TodoItem
       onCheckBoxToggle={action("checked")}
-      text="Hello World Todo Item"
-      request={request}
+      item={{
+        data: {
+          id: 0.3456,
+          text: "Hello World Todo Item",
+        },
+        request,
+      }}
     />
   </List>
 );
 
 export const withEmoji = () => (
   <List>
-    <TodoItem text="😀 😎 👍 💯" request={request} />
+    <TodoItem
+      item={{
+        data: {
+          id: 0.87654321,
+          text: "😀 😎 👍 💯",
+        },
+        request,
+      }}
+    />
   </List>
 );
 
@@ -90,8 +103,13 @@ export const withRequest = () => {
       <List>
         <TodoItem
           onCheckBoxToggle={action("checked")}
-          text="Hello World Todo Item"
-          request={testRequest}
+          item={{
+            data: {
+              id: 0.98765,
+              text: "Hello World Todo Item",
+            },
+            request: testRequest,
+          }}
         />
       </List>
     </>

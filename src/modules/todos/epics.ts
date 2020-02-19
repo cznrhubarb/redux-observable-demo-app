@@ -3,11 +3,10 @@ import { catchError, map, retry } from "rxjs/operators";
 import { Observable, of } from "rxjs";
 import { ajax, ajaxGet } from "rxjs/internal-compatibility";
 
-import { TodoItem } from "@modules/todos/models";
+import { TodoStateItem } from "@modules/todos/models";
 import {
   RequestState as RS,
   RequestType as RT,
-  Request,
   matchRequest,
 } from "@modules/common/requests";
 import { feedbackFlag, feedbackArray } from "@modules/common/operators";
@@ -18,11 +17,11 @@ const loadTodosEpic: Epic = (_, state$: StateObservable<AppState>) =>
   state$.pipe(
     map(state => state.todos),
     feedbackFlag(
-      s => matchRequest(RT.read, RS.inProgress)(s.loadingRequest),
+      state => matchRequest(RT.read, RS.inProgress)(state.loading),
       () =>
         ajaxGet("http://localhost:5000/todos").pipe(
           retry(3),
-          map(response => actions.loadTodosDone(response.response)),
+          map(request => actions.loadTodosDone(request.response)),
           catchError(() => of(actions.loadTodosError()))
         )
     )
@@ -30,71 +29,66 @@ const loadTodosEpic: Epic = (_, state$: StateObservable<AppState>) =>
 
 const updateTodoEpic: Epic = (_, state$: StateObservable<AppState>) =>
   state$.pipe(
-    map(s => s.todos),
-    feedbackArray<TodoState, Request<TodoItem>>(
-      s => s.todoRequests.filter(matchRequest(RT.update, RS.inProgress)),
-      request =>
+    map(state => state.todos),
+    feedbackArray<TodoState, TodoStateItem>(
+      state =>
+        state.entities.filter(entity =>
+          matchRequest(RT.update, RS.inProgress)(entity.request)
+        ),
+      entity =>
         ajax({
-          url: `http://localhost:5000/todos/${request.payload.id}`,
+          url: `http://localhost:5000/todos/${entity.data.id}`,
           method: "PUT",
-          body: request.payload, // Move update somewhere else
+          body: entity.data, // Move update somewhere else
           headers: {
             "Content-Type": "application/json",
           },
         }).pipe(
           retry(3),
-          map(() => actions.updateTodoDone(request.payload)),
-          catchError(e =>
-            of(
-              actions.updateTodoError({
-                item: request.payload,
-                error: e,
-              })
-            )
-          )
+          map(() => actions.updateTodoDone(entity.request.payload)),
+          catchError(error => of(actions.updateTodoError(entity, error)))
         )
     )
   );
 
 const addTodoEpic: Epic = (_, state$: Observable<AppState>) =>
   state$.pipe(
-    map(s => s.todos),
-    feedbackArray<TodoState, Request<TodoItem>>(
-      s => s.todoRequests.filter(matchRequest(RT.create, RS.inProgress)),
-      request =>
+    map(state => state.todos),
+    feedbackArray<TodoState, TodoStateItem>(
+      state =>
+        state.entities.filter(entity =>
+          matchRequest(RT.create, RS.inProgress)(entity.request)
+        ),
+      entity =>
         ajax({
           url: "http://localhost:5000/todos",
           method: "POST",
-          body: request.payload,
+          body: entity.data,
           headers: {
             "Content-Type": "application/json",
           },
         }).pipe(
-          map(r => actions.addTodoDone(r.response)),
-          catchError(() => of(actions.addTodoError(request.payload)))
+          map(() => actions.addTodoDone(entity.request.payload)),
+          catchError(error => of(actions.addTodoError(entity.data, error)))
         )
     )
   );
 
 const removeTodoEpic: Epic = (_, state$: Observable<AppState>) =>
   state$.pipe(
-    map(s => s.todos),
-    feedbackArray<TodoState, Request<TodoItem>>(
-      s => s.todoRequests.filter(matchRequest(RT.delete, RS.inProgress)),
-      request =>
+    map(state => state.todos),
+    feedbackArray<TodoState, TodoStateItem>(
+      state =>
+        state.entities.filter(entity =>
+          matchRequest(RT.delete, RS.inProgress)(entity.request)
+        ),
+      entity =>
         ajax({
-          url: `http://localhost:5000/todos/${request.payload.id}`,
+          url: `http://localhost:5000/todos/${entity.data.id}`,
           method: "DELETE",
         }).pipe(
-          map(() => actions.removeTodoDone(request.payload)),
-          catchError(e =>
-            of(
-              actions.removeTodoError({
-                item: request.payload,
-                error: e,
-              })
-            )
-          )
+          map(() => actions.removeTodoDone(entity.data)),
+          catchError(error => of(actions.removeTodoError(entity.data, error)))
         )
     )
   );
