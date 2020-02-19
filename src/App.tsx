@@ -6,7 +6,7 @@ import MUDivider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
 import { CircularProgress, Typography } from "@material-ui/core";
 
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 
 import {
   actions as todoActions,
@@ -21,22 +21,33 @@ import {
   matchRequest,
 } from "@modules/common/requests";
 
+const theme = {
+  color: {
+    black: "#000",
+  },
+  layout: {
+    width: 500,
+  },
+  spacing: 10,
+};
+
 const Wrap = styled.div`
   display: flex;
   justify-content: center;
+  color: ${props => props.theme.color.black};
 `;
 
 const Content = styled.div`
-  width: 500px;
+  width: ${props => props.theme.layout.width}px;
 `;
 
 const AddButton = styled(Button)`
-  margin-top: 10px;
+  margin-top: ${props => props.theme.spacing}px;
 `;
 
 const Divider = styled(MUDivider)`
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: ${props => props.theme.spacing}px;
+  margin-bottom: ${props => props.theme.spacing}px;
 `;
 
 const App: React.FC = () => {
@@ -77,68 +88,70 @@ const App: React.FC = () => {
   };
 
   return (
-    <Wrap>
-      <Content>
-        <div>
-          <TextField
-            multiline
-            autoFocus
-            inputRef={textRef}
-            placeholder="Enter todo message"
-            rows="5"
-            variant="outlined"
-            onChange={onDescChange}
-            value={desc}
-            fullWidth
-          />
-          <AddButton
-            disabled={!desc}
-            color="primary"
-            variant="contained"
-            onClick={addNewTodo}
-            fullWidth
-          >
-            Add Todo
-          </AddButton>
-        </div>
+    <ThemeProvider theme={theme}>
+      <Wrap>
+        <Content>
+          <div>
+            <TextField
+              multiline
+              autoFocus
+              inputRef={textRef}
+              placeholder="Enter todo message"
+              rows="5"
+              variant="outlined"
+              onChange={onDescChange}
+              value={desc}
+              fullWidth
+            />
+            <AddButton
+              disabled={!desc}
+              color="primary"
+              variant="contained"
+              onClick={addNewTodo}
+              fullWidth
+            >
+              Add Todo
+            </AddButton>
+          </div>
 
-        <Divider />
+          <Divider />
 
-        <div>
-          {matchRequest(RT.read, RS.inProgress)(loading) && (
-            <Wrap>
-              <CircularProgress />
-            </Wrap>
-          )}
-
-          {matchRequest(RT.read, RS.error)(loading) && (
-            <Typography color="error">Failed to load todos</Typography>
-          )}
-
-          {matchRequest(RT.read, RS.success)(loading) && (
-            <>
-              <TodoList
-                items={entities}
-                onItemUpdate={updateTodo}
-                onItemDelete={deleteTodo}
-              />
-            </>
-          )}
-
-          <Wrap>
-            {matchRequest(RT.read, RS.inProgress)(loading) ? (
-              <Button onClick={onCancel} color="secondary">
-                Cancel
-              </Button>
-            ) : (
-              <Button onClick={onReset} color="primary">
-                Reload
-              </Button>
+          <div>
+            {matchRequest(RT.read, RS.inProgress)(loading) && (
+              <Wrap>
+                <CircularProgress />
+              </Wrap>
             )}
-          </Wrap>
-        </div>
-      </Content>
-    </Wrap>
+
+            {matchRequest(RT.read, RS.error)(loading) && (
+              <Typography color="error">Failed to load todos</Typography>
+            )}
+
+            {matchRequest(RT.read, RS.success)(loading) && (
+              <>
+                <TodoList
+                  items={entities}
+                  onItemUpdate={updateTodo}
+                  onItemDelete={deleteTodo}
+                />
+              </>
+            )}
+
+            <Wrap>
+              {matchRequest(RT.read, RS.inProgress)(loading) ? (
+                <Button onClick={onCancel} color="secondary">
+                  Cancel
+                </Button>
+              ) : (
+                <Button onClick={onReset} color="primary">
+                  Reload
+                </Button>
+              )}
+            </Wrap>
+          </div>
+        </Content>
+      </Wrap>
+    </ThemeProvider>
   );
 };
 

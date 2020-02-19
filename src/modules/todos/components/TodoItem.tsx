@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-
+import styled from "styled-components";
 import {
   ListItem,
   Checkbox,
@@ -26,6 +26,10 @@ export interface Props {
   onCheckBoxToggle?: () => void;
 }
 
+const TodoText = styled(ListItemText)`
+  color: ${props => props.theme.color.black};
+`;
+
 const TodoListItem: React.FC<Props> = memo(props => {
   const { item, divider, onDeleteButtonClick, onCheckBoxToggle } = props;
 
@@ -37,7 +41,7 @@ const TodoListItem: React.FC<Props> = memo(props => {
         <Checkbox onClick={onCheckBoxToggle} checked={item.data.completed} />
       )}
 
-      <ListItemText
+      <TodoText
         primary={item.data.text}
         secondary={
           item.request && `Request ${item.request.type} ${item.request.state}`

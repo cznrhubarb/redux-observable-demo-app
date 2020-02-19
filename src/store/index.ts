@@ -1,4 +1,4 @@
-import { combineReducers } from "redux";
+import { combineReducers, Action } from "redux";
 import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { combineEpics, createEpicMiddleware } from "redux-observable";
 import { createLogger } from "redux-logger";
@@ -27,7 +27,12 @@ export const initialState: AppState = {
 
 export function createStore() {
   const logger = createLogger();
-  const epicMiddleware = createEpicMiddleware();
+  // Set state type explicitly to avoid redux-observable TS bug
+  const epicMiddleware = createEpicMiddleware<
+    Action<unknown>,
+    Action<unknown>,
+    AppState
+  >();
   const rootEpic = combineEpics(todosEpics);
 
   const middleware = [...getDefaultMiddleware(), epicMiddleware, logger];
